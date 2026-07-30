@@ -1,8 +1,29 @@
 #include "Graphics/ShaderLoader.hpp"
 #include "Core/Logger.hpp"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+
 namespace PHX
 {
+
+static bool ReadTextFile(const char* path, std::string& output)
+{
+    std::ifstream file(path);
+
+    if (!file.is_open())
+    {
+        Logger::Error(path);
+        return false;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    output = buffer.str();
+
+    return true;
+}
 
 bool ShaderLoader::Load(const char* vertexPath, const char* fragmentPath)
 {
@@ -23,9 +44,23 @@ bool ShaderLoader::Load(const char* vertexPath, const char* fragmentPath)
         return false;
     }
 
-    Logger::Info("Vertex shader path OK.");
-    Logger::Info("Fragment shader path OK.");
+    std::string vertexSource;
+    std::string fragmentSource;
 
+    if (!ReadTextFile(vertexPath, vertexSource))
+    {
+        Logger::Error("Failed to read vertex shader.");
+        return false;
+    }
+
+    if (!ReadTextFile(fragmentPath, fragmentSource))
+    {
+        Logger::Error("Failed to read fragment shader.");
+        return false;
+    }
+
+    Logger::Info("Vertex shader loaded.");
+    Logger::Info("Fragment shader loaded.");
     Logger::Info("ShaderLoader ready.");
 
     return true;
