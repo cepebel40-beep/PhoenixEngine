@@ -1,12 +1,32 @@
 #include "Graphics/ShaderLoader.hpp"
 #include "Core/Logger.hpp"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #ifdef __ANDROID__
 #include <GLES3/gl3.h>
 #endif
 
 namespace PHX
 {
+
+static std::string ReadTextFile(const char* path)
+{
+    std::ifstream file(path);
+
+    if(!file.is_open())
+    {
+        Logger::Error("Failed to open shader file.");
+        return "";
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    return buffer.str();
+}
 
 ShaderLoader::ShaderLoader()
 {
@@ -20,30 +40,29 @@ ShaderLoader::~ShaderLoader()
 
 bool ShaderLoader::Load(const char* vertexPath, const char* fragmentPath)
 {
-    Logger::Info("================================");
-    Logger::Info("Phoenix ShaderLoader");
-    Logger::Info("Preparing shader system...");
-    Logger::Info("================================");
-
-    if(vertexPath == nullptr)
+    if(vertexPath == nullptr || fragmentPath == nullptr)
     {
-        Logger::Error("Vertex shader path is null");
+        Logger::Error("Shader path invalid.");
         return false;
     }
 
-    if(fragmentPath == nullptr)
+    std::string vertexSource = ReadTextFile(vertexPath);
+    std::string fragmentSource = ReadTextFile(fragmentPath);
+
+    if(vertexSource.empty())
     {
-        Logger::Error("Fragment shader path is null");
+        Logger::Error("Vertex shader empty.");
         return false;
     }
 
-    Logger::Info("Vertex Shader:");
-    Logger::Info(vertexPath);
+    if(fragmentSource.empty())
+    {
+        Logger::Error("Fragment shader empty.");
+        return false;
+    }
 
-    Logger::Info("Fragment Shader:");
-    Logger::Info(fragmentPath);
-
-    Logger::Info("ShaderLoader ready.");
+    Logger::Info("Vertex shader loaded.");
+    Logger::Info("Fragment shader loaded.");
 
     return true;
 }
