@@ -1,2 +1,10 @@
 #pragma once
-namespace PHX { bool InstallOpenGLHooks(); }
+
+namespace PHX
+{
+
+bool InstallOpenGLHooks();
+
+void RemoveOpenGLHooks();
+
+}
