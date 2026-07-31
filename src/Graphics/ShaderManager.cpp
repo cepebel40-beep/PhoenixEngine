@@ -1,79 +1,64 @@
-#include "Graphics/ShaderManager.hpp"
-#include "Graphics/ShaderLoader.hpp"
-#include "Core/Logger.hpp"
-
+#include "ShaderManager.h"
 #include <GLES3/gl3.h>
+#include <android/log.h>
 
-namespace PHX
-{
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"Phoenix",__VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"Phoenix",__VA_ARGS__)
 
-static const char* DefaultVertexShader = R"(#version 300 es
+static GLuint gVertexShader = 0;
+static GLuint gFragmentShader = 0;
+static GLuint gProgram = 0;
 
-layout(location = 0) in vec3 aPosition;
+static const char* DefaultVertexShader =
+"#version 300 es\n"
+"layout(location=0) in vec3 aPos;\n"
+"void main(){\n"
+"gl_Position=vec4(aPos,1.0);\n"
+"}";
 
-void main()
-{
-    gl_Position = vec4(aPosition, 1.0);
-}
-
-)";
+static const char* DefaultFragmentShader =
+"#version 300 es\n"
+"precision mediump float;\n"
+"out vec4 FragColor;\n"
+"void main(){\n"
+"FragColor=vec4(1.0,1.0,1.0,1.0);\n"
+"}";
 
 bool ShaderManager::Initialize()
 {
-    Logger::Info("ShaderManager initializing...");
+    gVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(gVertexShader,1,&DefaultVertexShader,nullptr);
+    glCompileShader(gVertexShader);
 
-    ShaderLoader loader;
+    GLint success = 0;
+    glGetShaderiv(gVertexShader,GL_COMPILE_STATUS,&success);
 
-    if (!loader.LoadDefaultShaders())
+    if(!success)
     {
-        Logger::Error("Failed to load default shaders.");
+        LOGE("Vertex Shader Compile Failed");
         return false;
     }
 
-    mProgram = glCreateProgram();
+    LOGI("Vertex Shader OK");
 
-    if (!mProgram)
+    gFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(gFragmentShader,1,&DefaultFragmentShader,nullptr);
+    glCompileShader(gFragmentShader);
+
+    glGetShaderiv(gFragmentShader,GL_COMPILE_STATUS,&success);
+
+    if(!success)
     {
-        Logger::Error("Failed to create OpenGL Program.");
+        LOGE("Fragment Shader Compile Failed");
         return false;
     }
 
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    LOGI("Fragment Shader OK");
 
-    if (!vertexShader)
-    {
-        Logger::Error("Failed to create Vertex Shader.");
-        return false;
-    }
-
-    glShaderSource(vertexShader, 1, &DefaultVertexShader, nullptr);
-    glCompileShader(vertexShader);
-
-    GLint compiled = GL_FALSE;
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compiled);
-
-    if (compiled != GL_TRUE)
-    {
-        Logger::Error("Vertex Shader compilation failed.");
-
-        glDeleteShader(vertexShader);
-
-        return false;
-    }
-
-    Logger::Info("Vertex Shader compiled successfully.");
-
-    glDeleteShader(vertexShader);
-
-    Logger::Info("ShaderManager ready.");
+    gProgram = glCreateProgram();
+    glAttachShader(gProgram,gVertexShader);
+    glAttachShader(gProgram,gFragmentShader);
+    glLinkProgram(gProgram);
 
     return true;
-}
-
-GLuint ShaderManager::GetProgram() const
-{
-    return mProgram;
-}
-
 }
