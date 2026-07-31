@@ -3,8 +3,8 @@
 #include <GLES3/gl3.h>
 #include <android/log.h>
 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"Phoenix",__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"Phoenix",__VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "Phoenix", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Phoenix", __VA_ARGS__)
 
 namespace PHX
 {
@@ -28,36 +28,87 @@ static const char* DefaultFragmentShader =
 
 bool ShaderManager::Initialize()
 {
+    GLint success = GL_FALSE;
+
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs,1,&DefaultVertexShader,nullptr);
+    glShaderSource(vs, 1, &DefaultVertexShader, nullptr);
     glCompileShader(vs);
 
-    GLint success = GL_FALSE;
-    glGetShaderiv(vs,GL_COMPILE_STATUS,&success);
+    glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
 
-    if(!success)
+    if (!success)
     {
         LOGE("Vertex shader compile failed");
-        return false;
-    }
-
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs,1,&DefaultFragmentShader,nullptr);
-    glCompileShader(fs);
-
-    glGetShaderiv(fs,GL_COMPILE_STATUS,&success);
-
-    if(!success)
-    {
-        LOGE("Fragment shader compile failed");
         glDeleteShader(vs);
         return false;
     }
 
+    LOGI("Vertex shader compiled");
+
+    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs, 1, &DefaultFragmentShader, nullptr);
+    glCompileShader(fs);
+
+    glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
+
+    if (!success)
+    {
+        LOGE("Fragment shader compile failed");
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+        return false;
+    }
+
+    LOGI("Fragment shader compiled");
+
     mProgram = glCreateProgram();
-    glAttachShader(mProgram,vs);
-    glAttachShader(mProgram,fs);
+
+    glAttachShader(mProgram, vs);
+    glAttachShader(mProgram, fs);
+
     glLinkProgram(mProgram);
+
+    glGetProgramiv(mProgram, GL_LINK_STATUS, &success);
+
+    if (!success)
+    {
+        char infoLog[1024] = {};
+        glGetProgramInfoLog(mProgram, sizeof(infoLog), nullptr, infoLog);
+
+        LOGE("Program link failed: %s", infoLog);
+
+        glDeleteProgram(mProgram);
+        mProgram = 0;
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+
+        return false;
+    }
+
+    LOGI("Program linked");
+
+    glValidateProgram(mProgram);
+
+    glGetProgramiv(mProgram, GL_VALIDATE_STATUS, &success);
+
+    if (!success)
+    {
+        char infoLog[1024] = {};
+        glGetProgramInfoLog(mProgram, sizeof(infoLog), nullptr, infoLog);
+
+        LOGE("Program validation failed: %s", infoLog);
+
+        glDeleteProgram(mProgram);
+        mProgram = 0;
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+
+        return false;
+    }
+
+    LOGI("Program validated");
 
     glDeleteShader(vs);
     glDeleteShader(fs);
