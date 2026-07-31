@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace PHX
 {
 
@@ -9,7 +11,7 @@ public:
     bool LoadDefaultShaders();
 
 private:
-    bool ReadTextFile(const char* path, char*& buffer);
+    bool ReadTextFile(const char* path, std::string& buffer);
 };
 
 }
