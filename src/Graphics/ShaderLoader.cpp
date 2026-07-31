@@ -1,7 +1,6 @@
 #include "Graphics/ShaderLoader.hpp"
 #include "Core/Logger.hpp"
 
-#include <string>
 #include <fstream>
 #include <sstream>
 
@@ -10,21 +9,41 @@ namespace PHX
 
 bool ShaderLoader::LoadDefaultShaders()
 {
-    std::string shaderSource;
+    std::string commonShader;
+    std::string vertexShader;
+    std::string fragmentShader;
 
     if (!ReadTextFile(
             "gta/files/phoenix/shaders/include/common.glsl",
-            shaderSource))
+            commonShader))
     {
         Logger::Error("Failed to load common.glsl");
         return false;
     }
 
-    Logger::Info("common.glsl loaded successfully");
+    if (!ReadTextFile(
+            "gta/files/phoenix/shaders/vs/default.vs",
+            vertexShader))
+    {
+        Logger::Error("Failed to load default.vs");
+        return false;
+    }
+
+    if (!ReadTextFile(
+            "gta/files/phoenix/shaders/ps/default.ps",
+            fragmentShader))
+    {
+        Logger::Error("Failed to load default.ps");
+        return false;
+    }
+
+    Logger::Info("ShaderLoader loaded all default shaders");
+
     return true;
 }
 
-bool ShaderLoader::ReadTextFile(const char* path, std::string& buffer)
+bool ShaderLoader::ReadTextFile(const char* path,
+                                std::string& buffer)
 {
     std::ifstream file(path);
 
