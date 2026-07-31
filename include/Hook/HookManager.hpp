@@ -1,0 +1,19 @@
+#pragma once
+
+#include <cstdint>
+
+namespace PHX
+{
+    class HookManager
+    {
+    public:
+
+        static bool Initialize();
+
+        static bool Install(uintptr_t target,
+                            uintptr_t detour,
+                            uintptr_t* original);
+
+        static bool Remove(uintptr_t target);
+    };
+}
