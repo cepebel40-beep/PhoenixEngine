@@ -5,13 +5,13 @@
 namespace PHX
 {
 
-static ShaderManager gShader;
+static ShaderManager gShaderManager;
 
-bool InitializeShaderPipeline()
+bool ShaderPipeline::Initialize()
 {
     Logger::Info("Initializing Shader Pipeline...");
 
-    if (!gShader.Initialize())
+    if (!gShaderManager.Initialize())
     {
         Logger::Error("Failed to initialize Shader Pipeline");
         return false;
@@ -22,14 +22,14 @@ bool InitializeShaderPipeline()
     return true;
 }
 
-GLuint GetShaderProgram()
+void ShaderPipeline::Update()
 {
-    return gShader.GetProgram();
+    // Runtime update (reserved)
 }
 
-void ShutdownShaderPipeline()
+void ShaderPipeline::Shutdown()
 {
-    gShader.Destroy();
+    gShaderManager.Destroy();
 
     Logger::Info("Shader Pipeline destroyed");
 }
