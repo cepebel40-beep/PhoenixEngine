@@ -7,6 +7,17 @@
 namespace PHX
 {
 
+static const char* DefaultVertexShader = R"(#version 300 es
+
+layout(location = 0) in vec3 aPosition;
+
+void main()
+{
+    gl_Position = vec4(aPosition, 1.0);
+}
+
+)";
+
 bool ShaderManager::Initialize()
 {
     Logger::Info("ShaderManager initializing...");
@@ -19,17 +30,41 @@ bool ShaderManager::Initialize()
         return false;
     }
 
-    Logger::Info("Creating OpenGL program...");
-
     mProgram = glCreateProgram();
 
-    if (mProgram == 0)
+    if (!mProgram)
     {
-        Logger::Error("glCreateProgram failed.");
+        Logger::Error("Failed to create OpenGL Program.");
         return false;
     }
 
-    Logger::Info("OpenGL program created.");
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+    if (!vertexShader)
+    {
+        Logger::Error("Failed to create Vertex Shader.");
+        return false;
+    }
+
+    glShaderSource(vertexShader, 1, &DefaultVertexShader, nullptr);
+    glCompileShader(vertexShader);
+
+    GLint compiled = GL_FALSE;
+
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compiled);
+
+    if (compiled != GL_TRUE)
+    {
+        Logger::Error("Vertex Shader compilation failed.");
+
+        glDeleteShader(vertexShader);
+
+        return false;
+    }
+
+    Logger::Info("Vertex Shader compiled successfully.");
+
+    glDeleteShader(vertexShader);
 
     Logger::Info("ShaderManager ready.");
 
