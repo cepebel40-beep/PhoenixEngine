@@ -1,4 +1,4 @@
-#include "ShaderManager.h"
+#include "ShaderManager.hpp"
 #include <GLES3/gl3.h>
 #include <android/log.h>
 
