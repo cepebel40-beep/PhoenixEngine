@@ -1,19 +1,37 @@
 #include "Graphics/ShaderPipeline.hpp"
 #include "Graphics/ShaderManager.hpp"
+#include "Core/Logger.hpp"
 
 namespace PHX
 {
 
-bool ShaderPipeline::Initialize()
+static ShaderManager gShader;
+
+bool InitializeShaderPipeline()
 {
-    ShaderManager manager;
-    return manager.Initialize();
+    Logger::Info("Initializing Shader Pipeline...");
+
+    if (!gShader.Initialize())
+    {
+        Logger::Error("Failed to initialize Shader Pipeline");
+        return false;
+    }
+
+    Logger::Info("Shader Pipeline initialized");
+
+    return true;
 }
 
-void ShaderPipeline::Shutdown()
+GLuint GetShaderProgram()
 {
-    // Belum digunakan.
-    // Akan diimplementasikan saat ShaderManager memiliki fungsi Shutdown().
+    return gShader.GetProgram();
+}
+
+void ShutdownShaderPipeline()
+{
+    gShader.Destroy();
+
+    Logger::Info("Shader Pipeline destroyed");
 }
 
 }
