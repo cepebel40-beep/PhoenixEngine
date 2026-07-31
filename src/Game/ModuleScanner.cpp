@@ -1,4 +1,5 @@
 #include "Game/ModuleScanner.hpp"
+#include "Game/ProcMapsReader.hpp"
 
 namespace PHX
 {
@@ -6,10 +7,14 @@ namespace PHX
 
     bool ModuleScanner::Scan()
     {
-        // Placeholder.
-        // Alpha berikutnya akan membaca /proc/self/maps
-        // untuk mencari base address libGTASA.so.
+        if (!ProcMapsReader::Refresh())
+            return false;
+
+        // Tahap berikutnya:
+        // Cari libGTASA.so dari daftar memory map.
+
         mBase = 0;
+
         return true;
     }
 
