@@ -1,26 +1,25 @@
 
-#include "Hook/OpenGLHook.hpp"
-
 #include "Graphics/OpenGLHook.hpp"
-
-#include "Core/Logger.hpp"
 
 namespace PHX
 {
 
-bool InstallOpenGLHooks()
+bool OpenGLHook::sInstalled = false;
+
+bool OpenGLHook::Install()
 {
-    Logger::Info("Installing OpenGL hooks...");
-
-    if (!OpenGLHook::Install())
-    {
-        Logger::Error("OpenGLHook::Install() failed.");
-        return false;
-    }
-
-    Logger::Info("OpenGL hooks installed.");
-
+    sInstalled = true;
     return true;
+}
+
+void OpenGLHook::Remove()
+{
+    sInstalled = false;
+}
+
+bool OpenGLHook::IsInstalled()
+{
+    return sInstalled;
 }
 
 }
