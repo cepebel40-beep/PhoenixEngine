@@ -5,13 +5,13 @@
 namespace PHX
 {
 
+static ShaderManager gShaderManager;
+
 bool InitializeRenderer()
 {
     Logger::Info("Initializing Renderer...");
 
-    ShaderManager shaderManager;
-
-    if (!shaderManager.Initialize())
+    if (!gShaderManager.Initialize())
     {
         Logger::Error("Renderer initialization failed.");
         return false;
