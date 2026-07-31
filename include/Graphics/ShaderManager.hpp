@@ -11,6 +11,8 @@ class ShaderManager
 public:
     ShaderManager();
 
+    ~ShaderManager();
+
     bool Initialize();
 
     GLuint LoadShader(GLenum type,
@@ -19,10 +21,12 @@ public:
     GLuint CreateProgram(const std::string& vertexSource,
                          const std::string& fragmentSource);
 
+    GLuint GetProgram() const;
+
     void Destroy();
 
 private:
-    GLuint mProgram;
+    GLuint mProgram = 0;
 };
 
 }
