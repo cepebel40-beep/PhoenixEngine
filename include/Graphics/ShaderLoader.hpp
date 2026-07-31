@@ -1,7 +1,15 @@
 #pragma once
-namespace PHX {
-class ShaderLoader{
+
+namespace PHX
+{
+
+class ShaderLoader
+{
 public:
-    bool Load(const char* vertex,const char* fragment);
+    bool LoadDefaultShaders();
+
+private:
+    bool ReadTextFile(const char* path, char*& buffer);
 };
+
 }
