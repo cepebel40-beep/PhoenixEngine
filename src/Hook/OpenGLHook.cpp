@@ -1,13 +1,25 @@
 #include "Hook/OpenGLHook.hpp"
-#include "Core/Logger.hpp"
+
+#include "Graphics/OpenGLRuntime.hpp"
+#include "Graphics/OpenGLFunctionTable.hpp"
 
 namespace PHX
 {
 
 bool InstallOpenGLHooks()
 {
-    Logger::Info("OpenGL hooks are temporarily disabled.");
+    if (!InitializeOpenGLRuntime())
+        return false;
+
+    if (!LoadOpenGLFunctionTable())
+        return false;
+
     return true;
+}
+
+void RemoveOpenGLHooks()
+{
+    // Tahap berikutnya akan menghapus hook asli di sini.
 }
 
 }
