@@ -11,7 +11,13 @@ bool ShaderManager::Initialize()
 
     ShaderLoader loader;
 
-    Logger::Info("ShaderLoader linked.");
+    if (!loader.LoadDefaultShaders())
+    {
+        Logger::Error("Failed to load default shaders.");
+        return false;
+    }
+
+    Logger::Info("Default shaders loaded.");
 
     Logger::Info("ShaderManager ready.");
 
