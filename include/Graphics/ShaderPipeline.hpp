@@ -1,25 +1,16 @@
-#include "Graphics/ShaderPipeline.hpp"
-#include "Graphics/ShaderManager.hpp"
+#pragma once
 
 namespace PHX
 {
 
-bool ShaderPipeline::Initialize()
+class ShaderPipeline
 {
-    ShaderManager manager;
-    return manager.Initialize();
-}
+public:
+    static bool Initialize();
 
-void ShaderPipeline::Shutdown()
-{
-    // Belum digunakan.
-    // Akan diimplementasikan saat ShaderManager memiliki fungsi Shutdown().
-}
+    static void Shutdown();
 
-void ShaderPipeline::Update()
-{
-    // Placeholder.
-    // Akan digunakan untuk update shader setiap frame.
-}
+    static void Update();
+};
 
 }
