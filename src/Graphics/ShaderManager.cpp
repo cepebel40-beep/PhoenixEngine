@@ -2,6 +2,8 @@
 #include "Graphics/ShaderLoader.hpp"
 #include "Core/Logger.hpp"
 
+#include <GLES3/gl3.h>
+
 namespace PHX
 {
 
@@ -17,11 +19,26 @@ bool ShaderManager::Initialize()
         return false;
     }
 
-    Logger::Info("Default shaders loaded.");
+    Logger::Info("Creating OpenGL program...");
+
+    mProgram = glCreateProgram();
+
+    if (mProgram == 0)
+    {
+        Logger::Error("glCreateProgram failed.");
+        return false;
+    }
+
+    Logger::Info("OpenGL program created.");
 
     Logger::Info("ShaderManager ready.");
 
     return true;
+}
+
+GLuint ShaderManager::GetProgram() const
+{
+    return mProgram;
 }
 
 }
