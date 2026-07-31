@@ -1,7 +1,19 @@
 #pragma once
-namespace PHX {
-class ShaderManager{
+
+#include <GLES3/gl3.h>
+
+namespace PHX
+{
+
+class ShaderManager
+{
 public:
- bool Initialize();
+    bool Initialize();
+
+    GLuint GetProgram() const;
+
+private:
+    GLuint mProgram = 0;
 };
+
 }
