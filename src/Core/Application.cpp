@@ -10,7 +10,7 @@ bool Application::Start()
     if (!InitializeEngine())
         return false;
 
-    RuntimeMonitor::Update();
+    #include "System/RuntimeMonitor.hpp"
 
     return true;
 }
