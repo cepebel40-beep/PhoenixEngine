@@ -9,6 +9,16 @@
 namespace PHX
 {
 
+ShaderManager::ShaderManager()
+    : mProgram(0)
+{
+}
+
+ShaderManager::~ShaderManager()
+{
+    Destroy();
+}
+
 static const char* DefaultVertexShader =
 "#version 300 es\n"
 "layout(location=0) in vec3 aPos;\n"
@@ -43,8 +53,6 @@ bool ShaderManager::Initialize()
         return false;
     }
 
-    LOGI("Vertex shader compiled");
-
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, &DefaultFragmentShader, nullptr);
     glCompileShader(fs);
@@ -53,13 +61,10 @@ bool ShaderManager::Initialize()
 
     if (!success)
     {
-        LOGE("Fragment shader compile failed");
         glDeleteShader(vs);
         glDeleteShader(fs);
         return false;
     }
-
-    LOGI("Fragment shader compiled");
 
     mProgram = glCreateProgram();
 
@@ -70,57 +75,34 @@ bool ShaderManager::Initialize()
 
     glGetProgramiv(mProgram, GL_LINK_STATUS, &success);
 
-    if (!success)
-    {
-        char infoLog[1024] = {};
-        glGetProgramInfoLog(mProgram, sizeof(infoLog), nullptr, infoLog);
-
-        LOGE("Program link failed: %s", infoLog);
-
-        glDeleteProgram(mProgram);
-        mProgram = 0;
-
-        glDeleteShader(vs);
-        glDeleteShader(fs);
-
-        return false;
-    }
-
-    LOGI("Program linked");
-
-    glValidateProgram(mProgram);
-
-    glGetProgramiv(mProgram, GL_VALIDATE_STATUS, &success);
-
-    if (!success)
-    {
-        char infoLog[1024] = {};
-        glGetProgramInfoLog(mProgram, sizeof(infoLog), nullptr, infoLog);
-
-        LOGE("Program validation failed: %s", infoLog);
-
-        glDeleteProgram(mProgram);
-        mProgram = 0;
-
-        glDeleteShader(vs);
-        glDeleteShader(fs);
-
-        return false;
-    }
-
-    LOGI("Program validated");
-
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    LOGI("ShaderManager initialized");
+    return success == GL_TRUE;
+}
 
-    return true;
+GLuint ShaderManager::LoadShader(GLenum, const std::string&)
+{
+    return 0;
+}
+
+GLuint ShaderManager::CreateProgram(const std::string&, const std::string&)
+{
+    return mProgram;
 }
 
 GLuint ShaderManager::GetProgram() const
 {
     return mProgram;
+}
+
+void ShaderManager::Destroy()
+{
+    if (mProgram != 0)
+    {
+        glDeleteProgram(mProgram);
+        mProgram = 0;
+    }
 }
 
 }
