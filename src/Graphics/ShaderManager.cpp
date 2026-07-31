@@ -1,5 +1,4 @@
 #include "Graphics/ShaderManager.hpp"
-#include "Graphics/ShaderLoader.hpp"
 #include "Core/Logger.hpp"
 
 namespace PHX
@@ -7,12 +6,12 @@ namespace PHX
 
 bool ShaderManager::Initialize()
 {
-    Logger::Info("Initializing ShaderManager...");
+    Logger::Info("ShaderManager initializing...");
 
-    ShaderLoader loader;
+    // Pipeline shader akan ditambahkan pada tahap berikutnya.
+    // Untuk saat ini cukup memastikan sistem siap.
 
-    Logger::Info("ShaderLoader ready.");
-    Logger::Info("ShaderManager initialized.");
+    Logger::Info("ShaderManager ready.");
 
     return true;
 }
