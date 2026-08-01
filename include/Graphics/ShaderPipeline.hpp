@@ -10,8 +10,8 @@ class ShaderPipeline
 {
 public:
     static GLuint Create(const std::string& name,
-                         GLuint vertexShader,
-                         GLuint fragmentShader);
+                         const std::string& vertexSource,
+                         const std::string& fragmentSource);
 
     static void Use(GLuint program);
 
