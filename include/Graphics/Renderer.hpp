@@ -1,2 +1,14 @@
 #pragma once
-namespace PHX { bool InitializeRenderer(); }
+
+#include <GLES3/gl3.h>
+
+namespace PHX
+{
+
+bool InitializeRenderer();
+
+GLuint GetRendererProgram();
+
+void ShutdownRenderer();
+
+}
