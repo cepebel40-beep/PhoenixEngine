@@ -18,7 +18,8 @@ add_library(Phoenix64 SHARED
     # ==========================
     # Memory
     # ==========================
-    src/Memory/LibraryLoader.cpp
+    
+    src/Core/LibraryLoader.cpp
     src/Memory/SymbolResolver.cpp
 
     # ==========================
