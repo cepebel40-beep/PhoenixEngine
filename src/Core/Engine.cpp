@@ -5,6 +5,7 @@
 #include "Graphics/Renderer.hpp"
 
 #include "Hook/OpenGLHook.hpp"
+#include "Hook/RenderHook.hpp"
 
 namespace PHX
 {
