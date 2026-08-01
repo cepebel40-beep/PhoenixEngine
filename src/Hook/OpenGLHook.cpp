@@ -15,19 +15,29 @@ bool InstallOpenGLHooks()
 {
     if (gHooksInstalled)
     {
-        LOGI("OpenGL hooks already installed");
+        LOGI("OpenGL hooks already installed.");
         return true;
     }
 
-    LOGI("Installing OpenGL hooks...");
+    LOGI("========================================");
+    LOGI(" Phoenix Engine");
+    LOGI(" Initializing OpenGL Hook System");
+    LOGI("========================================");
 
-    // Placeholder.
-    // Hook eglSwapBuffers, glShaderSource,
-    // glUseProgram, dll akan dipasang di sini.
+    /*
+        Future hook list:
+
+        eglSwapBuffers()
+        glShaderSource()
+        glAttachShader()
+        glCompileShader()
+        glLinkProgram()
+        glUseProgram()
+    */
 
     gHooksInstalled = true;
 
-    LOGI("OpenGL hooks installed");
+    LOGI("OpenGL hook system initialized.");
 
     return true;
 }
@@ -37,11 +47,16 @@ void RemoveOpenGLHooks()
     if (!gHooksInstalled)
         return;
 
-    LOGI("Removing OpenGL hooks...");
+    LOGI("Shutting down OpenGL hook system...");
 
     gHooksInstalled = false;
 
-    LOGI("OpenGL hooks removed");
+    LOGI("OpenGL hook system shutdown complete.");
+}
+
+bool IsOpenGLHookInstalled()
+{
+    return gHooksInstalled;
 }
 
 }
