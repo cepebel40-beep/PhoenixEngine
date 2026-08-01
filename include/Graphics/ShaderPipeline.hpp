@@ -1,16 +1,21 @@
 #pragma once
 
+#include <string>
+#include <GLES3/gl3.h>
+
 namespace PHX
 {
 
 class ShaderPipeline
 {
 public:
-    static bool Initialize();
+    static GLuint Create(const std::string& name,
+                         GLuint vertexShader,
+                         GLuint fragmentShader);
 
-    static void Shutdown();
+    static void Use(GLuint program);
 
-    static void Update();
+    static void Destroy(GLuint program);
 };
 
 }
