@@ -7,37 +7,63 @@
 namespace PHX
 {
 
+static bool ReadFileInternal(const char* path, std::string& output)
+{
+    std::ifstream file(path, std::ios::binary);
+
+    if (!file.is_open())
+    {
+        Logger::Error("Cannot open shader file:");
+        Logger::Error(path);
+        return false;
+    }
+
+    std::stringstream stream;
+    stream << file.rdbuf();
+
+    output = stream.str();
+
+    if (output.empty())
+    {
+        Logger::Error("Shader file is empty:");
+        Logger::Error(path);
+        return false;
+    }
+
+    Logger::Info("Loaded shader:");
+    Logger::Info(path);
+
+    return true;
+}
+
 bool ShaderLoader::LoadDefaultShaders()
 {
     std::string commonShader;
     std::string vertexShader;
     std::string fragmentShader;
 
-    if (!ReadTextFile(
+    if (!ReadFileInternal(
             "gta/files/phoenix/shaders/include/common.glsl",
             commonShader))
     {
-        Logger::Error("Failed to load common.glsl");
         return false;
     }
 
-    if (!ReadTextFile(
+    if (!ReadFileInternal(
             "gta/files/phoenix/shaders/vs/default.vs",
             vertexShader))
     {
-        Logger::Error("Failed to load default.vs");
         return false;
     }
 
-    if (!ReadTextFile(
+    if (!ReadFileInternal(
             "gta/files/phoenix/shaders/ps/default.ps",
             fragmentShader))
     {
-        Logger::Error("Failed to load default.ps");
         return false;
     }
 
-    Logger::Info("ShaderLoader loaded all default shaders");
+    Logger::Info("Default shaders loaded successfully.");
 
     return true;
 }
@@ -45,17 +71,7 @@ bool ShaderLoader::LoadDefaultShaders()
 bool ShaderLoader::ReadTextFile(const char* path,
                                 std::string& buffer)
 {
-    std::ifstream file(path);
-
-    if (!file.is_open())
-        return false;
-
-    std::stringstream stream;
-    stream << file.rdbuf();
-
-    buffer = stream.str();
-
-    return true;
+    return ReadFileInternal(path, buffer);
 }
 
 }
