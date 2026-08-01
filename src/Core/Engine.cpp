@@ -26,18 +26,18 @@ bool InitializeEngine()
         return false;
     }
 
-    if (!InstallOpenGLHooks())
+    if (!OpenGLHook::Initialize())
     {
-        Logger::Error("Failed to install OpenGL hooks");
+        Logger::Error("Failed to initialize OpenGLHook");
         return false;
     }
-    
+
     if (!InstallRenderHooks())
     {
         Logger::Error("Failed to install Render hooks");
         return false;
     }
-    
+
     Logger::Info("Engine initialized");
 
     return true;
