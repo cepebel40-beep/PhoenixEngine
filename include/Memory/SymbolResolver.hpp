@@ -1,14 +1,19 @@
 #pragma once
 
-#include <cstdint>
-
 namespace PHX
 {
-    class SymbolResolver
-    {
-    public:
-        static bool Initialize();
 
-        static uintptr_t Resolve(const char* symbol);
-    };
+class SymbolResolver
+{
+public:
+
+    static bool Initialize();
+
+    static void Shutdown();
+
+    static void* ResolveOpenGL(const char* symbol);
+
+    static void* ResolveEGL(const char* symbol);
+};
+
 }
