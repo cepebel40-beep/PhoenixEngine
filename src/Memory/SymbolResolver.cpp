@@ -4,31 +4,50 @@
 
 namespace PHX
 {
-    static void* gHandle = nullptr;
 
-    bool SymbolResolver::Initialize()
+static void* gOpenGLHandle = nullptr;
+static void* gEGLHandle = nullptr;
+
+bool SymbolResolver::Initialize()
+{
+    if (!gOpenGLHandle)
+        gOpenGLHandle = dlopen("libGLESv3.so", RTLD_NOW);
+
+    if (!gEGLHandle)
+        gEGLHandle = dlopen("libEGL.so", RTLD_NOW);
+
+    return (gOpenGLHandle && gEGLHandle);
+}
+
+void SymbolResolver::Shutdown()
+{
+    if (gOpenGLHandle)
     {
-        if (gHandle)
-            return true;
-
-        gHandle = dlopen(nullptr, RTLD_NOW);
-
-        return gHandle != nullptr;
+        dlclose(gOpenGLHandle);
+        gOpenGLHandle = nullptr;
     }
 
-    uintptr_t SymbolResolver::Resolve(const char* symbol)
+    if (gEGLHandle)
     {
-        if (!gHandle)
-            return 0;
-
-        if (!symbol)
-            return 0;
-
-        void* address = dlsym(gHandle, symbol);
-
-        if (!address)
-            return 0;
-
-        return reinterpret_cast<uintptr_t>(address);
+        dlclose(gEGLHandle);
+        gEGLHandle = nullptr;
     }
+}
+
+void* SymbolResolver::ResolveOpenGL(const char* symbol)
+{
+    if (!gOpenGLHandle || !symbol)
+        return nullptr;
+
+    return dlsym(gOpenGLHandle, symbol);
+}
+
+void* SymbolResolver::ResolveEGL(const char* symbol)
+{
+    if (!gEGLHandle || !symbol)
+        return nullptr;
+
+    return dlsym(gEGLHandle, symbol);
+}
+
 }
