@@ -1,62 +1,59 @@
 #include "Hook/OpenGLHook.hpp"
 
-#include <GLES3/gl3.h>
-#include <android/log.h>
-
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "Phoenix", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Phoenix", __VA_ARGS__)
+#include "Graphics/OpenGLFunctionTable.hpp"
+#include "Core/Logger.hpp"
 
 namespace PHX
 {
 
-static bool gHooksInstalled = false;
-
-bool InstallOpenGLHooks()
+bool OpenGLHook::Initialize()
 {
-    if (gHooksInstalled)
+    Logger::Info("Initializing OpenGLHook");
+
+    if (!OpenGLFunctionTable::Initialize())
     {
-        LOGI("OpenGL hooks already installed.");
-        return true;
+        Logger::Error("Failed to initialize OpenGLFunctionTable");
+        return false;
     }
 
-    LOGI("========================================");
-    LOGI(" Phoenix Engine");
-    LOGI(" Initializing OpenGL Hook System");
-    LOGI("========================================");
+    HookUseProgram();
+    HookCompileShader();
+    HookLinkProgram();
 
-    /*
-        Future hook list:
-
-        eglSwapBuffers()
-        glShaderSource()
-        glAttachShader()
-        glCompileShader()
-        glLinkProgram()
-        glUseProgram()
-    */
-
-    gHooksInstalled = true;
-
-    LOGI("OpenGL hook system initialized.");
+    Logger::Info("OpenGLHook initialized");
 
     return true;
 }
 
-void RemoveOpenGLHooks()
+void OpenGLHook::Shutdown()
 {
-    if (!gHooksInstalled)
-        return;
+    OpenGLFunctionTable::Shutdown();
 
-    LOGI("Shutting down OpenGL hook system...");
-
-    gHooksInstalled = false;
-
-    LOGI("OpenGL hook system shutdown complete.");
+    Logger::Info("OpenGLHook shutdown");
 }
 
-bool IsOpenGLHookInstalled()
+void OpenGLHook::HookUseProgram()
 {
-    return gHooksInstalled;
+    if (OpenGLFunctionTable::glUseProgramPtr)
+    {
+        Logger::Info("glUseProgram located");
+    }
+}
+
+void OpenGLHook::HookCompileShader()
+{
+    if (OpenGLFunctionTable::glCompileShaderPtr)
+    {
+        Logger::Info("glCompileShader located");
+    }
+}
+
+void OpenGLHook::HookLinkProgram()
+{
+    if (OpenGLFunctionTable::glLinkProgramPtr)
+    {
+        Logger::Info("glLinkProgram located");
+    }
 }
 
 }
