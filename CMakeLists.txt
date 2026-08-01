@@ -39,6 +39,7 @@ add_library(Phoenix64 SHARED
     # ==========================
     # Hook
     # ==========================
+    src/Hook/HookManager.cpp
     src/Hook/RenderHook.cpp
     src/Hook/OpenGLHook.cpp
 )
