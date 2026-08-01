@@ -5,6 +5,9 @@ project(Phoenix)
 add_library(Phoenix64 SHARED
     src/main.cpp
 
+    # ==========================
+    # Core
+    # ==========================
     src/Core/Logger.cpp
     src/Core/Config.cpp
     src/Core/Memory.cpp
@@ -12,6 +15,15 @@ add_library(Phoenix64 SHARED
     src/Core/Engine.cpp
     src/Core/Application.cpp
 
+    # ==========================
+    # Memory
+    # ==========================
+    src/Memory/LibraryLoader.cpp
+    src/Memory/SymbolResolver.cpp
+
+    # ==========================
+    # Graphics
+    # ==========================
     src/Graphics/Renderer.cpp
     src/Graphics/ShaderManager.cpp
     src/Graphics/ShaderLoader.cpp
@@ -23,6 +35,9 @@ add_library(Phoenix64 SHARED
     src/Graphics/OpenGLRuntime.cpp
     src/Graphics/OpenGLFunctionTable.cpp
 
+    # ==========================
+    # Hook
+    # ==========================
     src/Hook/RenderHook.cpp
     src/Hook/OpenGLHook.cpp
 )
@@ -30,7 +45,11 @@ add_library(Phoenix64 SHARED
 find_library(log-lib log)
 find_library(gles-lib GLESv3)
 
-target_include_directories(Phoenix64 PRIVATE include)
+target_include_directories(
+    Phoenix64
+    PRIVATE
+    include
+)
 
 target_link_libraries(
     Phoenix64
@@ -41,4 +60,8 @@ target_link_libraries(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-target_compile_features(Phoenix64 PRIVATE cxx_std_17)
+target_compile_features(
+    Phoenix64
+    PRIVATE
+    cxx_std_17
+)
