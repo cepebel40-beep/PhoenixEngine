@@ -1,6 +1,5 @@
 #include "Hook/OpenGLHook.hpp"
 
-#include "Hook/HookManager.hpp"
 #include "Graphics/OpenGLFunctionTable.hpp"
 #include "Core/Logger.hpp"
 
@@ -11,21 +10,9 @@ bool OpenGLHook::Initialize()
 {
     Logger::Info("Initializing OpenGLHook");
 
-    if (!HookManager::Initialize())
-    {
-        Logger::Error("HookManager initialization failed");
-        return false;
-    }
-
     if (!OpenGLFunctionTable::Initialize())
     {
-        Logger::Error("OpenGLFunctionTable initialization failed");
-        return false;
-    }
-
-    if (!HookManager::InstallOpenGLHooks())
-    {
-        Logger::Error("InstallOpenGLHooks failed");
+        Logger::Error("Failed to initialize OpenGLFunctionTable");
         return false;
     }
 
@@ -40,11 +27,7 @@ bool OpenGLHook::Initialize()
 
 void OpenGLHook::Shutdown()
 {
-    HookManager::RemoveOpenGLHooks();
-
     OpenGLFunctionTable::Shutdown();
-
-    HookManager::Shutdown();
 
     Logger::Info("OpenGLHook shutdown");
 }
@@ -52,19 +35,25 @@ void OpenGLHook::Shutdown()
 void OpenGLHook::HookUseProgram()
 {
     if (OpenGLFunctionTable::glUseProgramPtr)
-        Logger::Info("glUseProgram ready");
+    {
+        Logger::Info("glUseProgram located");
+    }
 }
 
 void OpenGLHook::HookCompileShader()
 {
     if (OpenGLFunctionTable::glCompileShaderPtr)
-        Logger::Info("glCompileShader ready");
+    {
+        Logger::Info("glCompileShader located");
+    }
 }
 
 void OpenGLHook::HookLinkProgram()
 {
     if (OpenGLFunctionTable::glLinkProgramPtr)
-        Logger::Info("glLinkProgram ready");
+    {
+        Logger::Info("glLinkProgram located");
+    }
 }
 
 }
