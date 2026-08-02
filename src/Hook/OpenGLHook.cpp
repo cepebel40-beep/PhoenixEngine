@@ -1,80 +1,52 @@
-#include "Hook/OpenGLHook.hpp"
+#include "Hook/OpenGLHooks.hpp"
 
-#include "Graphics/OpenGLFunctionTable.hpp"
 #include "Core/Logger.hpp"
+#include "Memory/SymbolResolver.hpp"
+#include "Hook/HookManager.hpp"
 
 namespace PHX
 {
 
-bool OpenGLHook::Initialize()
-{
-    Logger::Info("Initializing OpenGLHook");
+void (*Original_glUseProgram)(GLuint) = nullptr;
 
-    if (!OpenGLFunctionTable::Initialize())
+void Hook_glUseProgram(GLuint program)
+{
+    if (Original_glUseProgram)
+        Original_glUseProgram(program);
+}
+
+bool InstallOpenGLHooks()
+{
+    auto target =
+        (uintptr_t)SymbolResolver::ResolveOpenGL("glUseProgram");
+
+    if (!target)
     {
-        Logger::Error("OpenGLFunctionTable initialization failed");
+        Logger::Error("glUseProgram not found");
         return false;
     }
 
-    HookUseProgram();
-    HookCompileShader();
-    HookLinkProgram();
+    if (!HookManager::Install(
+            target,
+            (uintptr_t)&Hook_glUseProgram,
+            (uintptr_t*)&Original_glUseProgram))
+    {
+        Logger::Error("Failed hook glUseProgram");
+        return false;
+    }
 
-    Logger::Info("OpenGLHook initialized");
+    Logger::Info("Hooked glUseProgram");
 
     return true;
 }
 
-void OpenGLHook::Shutdown()
+void RemoveOpenGLHooks()
 {
-    OpenGLFunctionTable::Shutdown();
+    auto target =
+        (uintptr_t)SymbolResolver::ResolveOpenGL("glUseProgram");
 
-    Logger::Info("OpenGLHook shutdown");
-}
-
-void OpenGLHook::HookUseProgram()
-{
-    Logger::Info("Preparing glUseProgram hook");
-}
-
-void OpenGLHook::HookCompileShader()
-{
-    Logger::Info("Preparing glCompileShader hook");
-}
-
-void OpenGLHook::HookLinkProgram()
-{
-    Logger::Info("Preparing glLinkProgram hook");
-}
-
-void OpenGLHook::HookedUseProgram(GLuint program)
-{
-    Logger::Info("Hooked glUseProgram");
-
-    if (OpenGLFunctionTable::glUseProgramPtr)
-    {
-        OpenGLFunctionTable::glUseProgramPtr(program);
-    }
-}
-
-void OpenGLHook::HookedCompileShader(GLuint shader)
-{
-    Logger::Info("Hooked glCompileShader");
-
-    if (OpenGLFunctionTable::glCompileShaderPtr)
-    {
-        OpenGLFunctionTable::glCompileShaderPtr(shader);
-    }
-}
-
-void OpenGLHook::HookedLinkProgram(GLuint program)
-{
-    Logger::Info("Hooked glLinkProgram");
-
-    if (OpenGLFunctionTable::glLinkProgramPtr)
-    {
-        OpenGLFunctionTable::glLinkProgramPtr(program);
-    }
+    if (target)
+        HookManager::Remove(target);
 }
 
 }
