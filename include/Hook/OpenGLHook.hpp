@@ -16,16 +16,24 @@ public:
 private:
 
     static void HookUseProgram();
+
     static void HookCompileShader();
+
     static void HookLinkProgram();
 
-    static void APIENTRY HookedUseProgram(GLuint program);
-    static void APIENTRY HookedCompileShader(GLuint shader);
-    static void APIENTRY HookedLinkProgram(GLuint program);
+    static void HookedUseProgram(GLuint program);
 
-    static void (APIENTRY* OriginalUseProgram)(GLuint);
-    static void (APIENTRY* OriginalCompileShader)(GLuint);
-    static void (APIENTRY* OriginalLinkProgram)(GLuint);
+    static void HookedCompileShader(GLuint shader);
+
+    static void HookedLinkProgram(GLuint program);
+
+    using UseProgramFn = void (*)(GLuint);
+    using CompileShaderFn = void (*)(GLuint);
+    using LinkProgramFn = void (*)(GLuint);
+
+    static UseProgramFn OriginalUseProgram;
+    static CompileShaderFn OriginalCompileShader;
+    static LinkProgramFn OriginalLinkProgram;
 };
 
 }
