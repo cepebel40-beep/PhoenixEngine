@@ -4,7 +4,7 @@
 #include "Graphics/ShaderManager.hpp"
 #include "Graphics/Renderer.hpp"
 
-#include "Hook/OpenGLHook.hpp"
+#include "Hook/HookManager.hpp"
 #include "Hook/RenderHook.hpp"
 
 namespace PHX
@@ -26,9 +26,15 @@ bool InitializeEngine()
         return false;
     }
 
-    if (!OpenGLHook::Initialize())
+    if (!HookManager::Initialize())
     {
-        Logger::Error("Failed to initialize OpenGLHook");
+        Logger::Error("Failed to initialize HookManager");
+        return false;
+    }
+
+    if (!HookManager::InstallOpenGLHooks())
+    {
+        Logger::Error("Failed to install OpenGL hooks");
         return false;
     }
 
