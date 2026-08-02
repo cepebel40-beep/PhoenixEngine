@@ -26,14 +26,6 @@ private:
     static void HookedCompileShader(GLuint shader);
 
     static void HookedLinkProgram(GLuint program);
-
-    using UseProgramFn = void (*)(GLuint);
-    using CompileShaderFn = void (*)(GLuint);
-    using LinkProgramFn = void (*)(GLuint);
-
-    static UseProgramFn OriginalUseProgram;
-    static CompileShaderFn OriginalCompileShader;
-    static LinkProgramFn OriginalLinkProgram;
 };
 
 }
