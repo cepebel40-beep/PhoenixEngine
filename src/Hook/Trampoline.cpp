@@ -33,10 +33,13 @@ bool Trampoline::RelocateInstruction(uint32_t* destination,
 }
 
 void Trampoline::WriteAbsoluteJump(uint32_t* destination,
-                                   uintptr_t)
+                                   uintptr_t address)
 {
-    destination[0] = 0x58000050;
-    destination[1] = 0xD61F0200;
-}
+    destination[0] = 0x58000050; // LDR X16, #8
+    destination[1] = 0xD61F0200; // BR X16
 
+    uint64_t* literal =
+        reinterpret_cast<uint64_t*>(&destination[2]);
+
+    *literal = static_cast<uint64_t>(address);
 }
