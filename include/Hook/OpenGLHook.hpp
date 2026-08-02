@@ -5,8 +5,8 @@
 namespace PHX
 {
 
-bool InstallRenderHooks();
-bool RemoveRenderHooks();
+bool InstallOpenGLHooks();
+bool RemoveOpenGLHooks();
 
 extern void (*Original_glUseProgram)(GLuint);
 
