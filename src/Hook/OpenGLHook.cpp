@@ -1,4 +1,4 @@
-#include "Hook/OpenGLHooks.hpp"
+#include "Hook/OpenGLHook.hpp"
 
 #include "Core/Logger.hpp"
 #include "Memory/SymbolResolver.hpp"
@@ -12,13 +12,16 @@ void (*Original_glUseProgram)(GLuint) = nullptr;
 void Hook_glUseProgram(GLuint program)
 {
     if (Original_glUseProgram)
+    {
         Original_glUseProgram(program);
+    }
 }
 
-bool InstallOpenGLHooks()
+bool InstallRenderHooks()
 {
     auto target =
-        (uintptr_t)SymbolResolver::ResolveOpenGL("glUseProgram");
+        reinterpret_cast<uintptr_t>(
+            SymbolResolver::ResolveOpenGL("glUseProgram"));
 
     if (!target)
     {
@@ -28,25 +31,28 @@ bool InstallOpenGLHooks()
 
     if (!HookManager::Install(
             target,
-            (uintptr_t)&Hook_glUseProgram,
-            (uintptr_t*)&Original_glUseProgram))
+            reinterpret_cast<uintptr_t>(&Hook_glUseProgram),
+            reinterpret_cast<uintptr_t*>(&Original_glUseProgram)))
     {
-        Logger::Error("Failed hook glUseProgram");
+        Logger::Error("Failed to install glUseProgram hook");
         return false;
     }
 
-    Logger::Info("Hooked glUseProgram");
+    Logger::Info("glUseProgram hooked");
 
     return true;
 }
 
-void RemoveOpenGLHooks()
+bool RemoveRenderHooks()
 {
     auto target =
-        (uintptr_t)SymbolResolver::ResolveOpenGL("glUseProgram");
+        reinterpret_cast<uintptr_t>(
+            SymbolResolver::ResolveOpenGL("glUseProgram"));
 
-    if (target)
-        HookManager::Remove(target);
+    if (!target)
+        return false;
+
+    return HookManager::Remove(target);
 }
 
 }
