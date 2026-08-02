@@ -34,35 +34,47 @@ void OpenGLHook::Shutdown()
 
 void OpenGLHook::HookUseProgram()
 {
-    if (OpenGLFunctionTable::glUseProgramPtr == nullptr)
-    {
-        Logger::Error("glUseProgram pointer is null");
-        return;
-    }
-
-    Logger::Info("glUseProgram hook ready");
+    Logger::Info("Preparing glUseProgram hook");
 }
 
 void OpenGLHook::HookCompileShader()
 {
-    if (OpenGLFunctionTable::glCompileShaderPtr == nullptr)
-    {
-        Logger::Error("glCompileShader pointer is null");
-        return;
-    }
-
-    Logger::Info("glCompileShader hook ready");
+    Logger::Info("Preparing glCompileShader hook");
 }
 
 void OpenGLHook::HookLinkProgram()
 {
-    if (OpenGLFunctionTable::glLinkProgramPtr == nullptr)
-    {
-        Logger::Error("glLinkProgram pointer is null");
-        return;
-    }
+    Logger::Info("Preparing glLinkProgram hook");
+}
 
-    Logger::Info("glLinkProgram hook ready");
+void OpenGLHook::HookedUseProgram(GLuint program)
+{
+    Logger::Info("Hooked glUseProgram");
+
+    if (OpenGLFunctionTable::glUseProgramPtr)
+    {
+        OpenGLFunctionTable::glUseProgramPtr(program);
+    }
+}
+
+void OpenGLHook::HookedCompileShader(GLuint shader)
+{
+    Logger::Info("Hooked glCompileShader");
+
+    if (OpenGLFunctionTable::glCompileShaderPtr)
+    {
+        OpenGLFunctionTable::glCompileShaderPtr(shader);
+    }
+}
+
+void OpenGLHook::HookedLinkProgram(GLuint program)
+{
+    Logger::Info("Hooked glLinkProgram");
+
+    if (OpenGLFunctionTable::glLinkProgramPtr)
+    {
+        OpenGLFunctionTable::glLinkProgramPtr(program);
+    }
 }
 
 }
