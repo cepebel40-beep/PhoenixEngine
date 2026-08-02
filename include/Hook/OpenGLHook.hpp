@@ -5,27 +5,11 @@
 namespace PHX
 {
 
-class OpenGLHook
-{
-public:
+bool InstallOpenGLHooks();
+void RemoveOpenGLHooks();
 
-    static bool Initialize();
+extern void (*Original_glUseProgram)(GLuint);
 
-    static void Shutdown();
-
-private:
-
-    static void HookUseProgram();
-
-    static void HookCompileShader();
-
-    static void HookLinkProgram();
-
-    static void HookedUseProgram(GLuint program);
-
-    static void HookedCompileShader(GLuint shader);
-
-    static void HookedLinkProgram(GLuint program);
-};
+void Hook_glUseProgram(GLuint program);
 
 }
