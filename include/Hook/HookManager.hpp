@@ -35,3 +35,6 @@ public:
 
 private:
     static bool sInitialized;
+};
+
+}
