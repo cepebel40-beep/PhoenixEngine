@@ -2,11 +2,24 @@
 
 #include "Core/Logger.hpp"
 #include "Memory/SymbolResolver.hpp"
+#include "Hook/OpenGLHook.hpp"
+
+#include <sys/mman.h>
+#include <unistd.h>
+#include <cstring>
 
 namespace PHX
 {
 
 bool HookManager::sInitialized = false;
+
+static HookManager::HookEntry gHook =
+{
+    0,
+    0,
+    0,
+    false
+};
 
 bool HookManager::Initialize()
 {
@@ -46,36 +59,45 @@ bool HookManager::Shutdown()
 
 bool HookManager::InstallOpenGLHooks()
 {
-    Logger::Info("Installing OpenGL hooks");
-
-    return true;
+    return PHX::InstallOpenGLHooks();
 }
 
 bool HookManager::RemoveOpenGLHooks()
 {
-    Logger::Info("Removing OpenGL hooks");
-
-    return true;
+    return PHX::RemoveOpenGLHooks();
 }
 
-bool HookManager::Install(uintptr_t target,
-                          uintptr_t detour,
-                          uintptr_t* original)
+bool HookManager::Install(
+    uintptr_t target,
+    uintptr_t detour,
+    uintptr_t* original)
 {
-    (void)target;
-    (void)detour;
-    (void)original;
+    if (!target || !detour)
+        return false;
 
-    Logger::Info("HookManager::Install()");
+    gHook.target = target;
+    gHook.detour = detour;
+    gHook.installed = true;
+
+    if (original)
+        *original = target;
+
+    Logger::Info("Hook installed (ARM64 stage)");
 
     return true;
 }
 
 bool HookManager::Remove(uintptr_t target)
 {
-    (void)target;
+    if (!gHook.installed)
+        return false;
 
-    Logger::Info("HookManager::Remove()");
+    if (gHook.target != target)
+        return false;
+
+    gHook.installed = false;
+
+    Logger::Info("Hook removed");
 
     return true;
 }
