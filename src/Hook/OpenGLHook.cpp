@@ -17,7 +17,7 @@ void Hook_glUseProgram(GLuint program)
     }
 }
 
-bool InstallRenderHooks()
+bool InstallOpenGLHooks()
 {
     auto target =
         reinterpret_cast<uintptr_t>(
@@ -43,7 +43,7 @@ bool InstallRenderHooks()
     return true;
 }
 
-bool RemoveRenderHooks()
+bool RemoveOpenGLHooks()
 {
     auto target =
         reinterpret_cast<uintptr_t>(
