@@ -1,5 +1,6 @@
 #include "Core/Engine.hpp"
 #include "Core/Logger.hpp"
+#include "Core/LibraryLoader.hpp"
 
 #include "Graphics/ShaderManager.hpp"
 #include "Graphics/Renderer.hpp"
@@ -12,6 +13,12 @@ namespace PHX
 
 bool InitializeEngine()
 {
+    if (!LibraryLoader::Initialize())
+    {
+        Logger::Error("Failed to initialize LibraryLoader");
+        return false;
+    }
+
     static ShaderManager shaderManager;
 
     if (!shaderManager.Initialize())
