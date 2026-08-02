@@ -12,7 +12,7 @@ bool OpenGLHook::Initialize()
 
     if (!OpenGLFunctionTable::Initialize())
     {
-        Logger::Error("Failed to initialize OpenGLFunctionTable");
+        Logger::Error("OpenGLFunctionTable initialization failed");
         return false;
     }
 
@@ -34,26 +34,35 @@ void OpenGLHook::Shutdown()
 
 void OpenGLHook::HookUseProgram()
 {
-    if (OpenGLFunctionTable::glUseProgramPtr)
+    if (OpenGLFunctionTable::glUseProgramPtr == nullptr)
     {
-        Logger::Info("glUseProgram located");
+        Logger::Error("glUseProgram pointer is null");
+        return;
     }
+
+    Logger::Info("glUseProgram hook ready");
 }
 
 void OpenGLHook::HookCompileShader()
 {
-    if (OpenGLFunctionTable::glCompileShaderPtr)
+    if (OpenGLFunctionTable::glCompileShaderPtr == nullptr)
     {
-        Logger::Info("glCompileShader located");
+        Logger::Error("glCompileShader pointer is null");
+        return;
     }
+
+    Logger::Info("glCompileShader hook ready");
 }
 
 void OpenGLHook::HookLinkProgram()
 {
-    if (OpenGLFunctionTable::glLinkProgramPtr)
+    if (OpenGLFunctionTable::glLinkProgramPtr == nullptr)
     {
-        Logger::Info("glLinkProgram located");
+        Logger::Error("glLinkProgram pointer is null");
+        return;
     }
+
+    Logger::Info("glLinkProgram hook ready");
 }
 
 }
