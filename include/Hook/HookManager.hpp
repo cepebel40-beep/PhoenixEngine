@@ -24,7 +24,7 @@ public:
 
     static bool IsInitialized();
 
-private:
+public:
     struct HookEntry
     {
         uintptr_t target;
@@ -33,7 +33,5 @@ private:
         bool installed;
     };
 
+private:
     static bool sInitialized;
-};
-
-}
