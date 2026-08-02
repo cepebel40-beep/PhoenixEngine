@@ -1,5 +1,5 @@
 #include "Hook/Trampoline.hpp"
-
+#include "Hook/InstructionDecoder.hpp"
 #include <cstring>
 
 namespace PHX
@@ -23,11 +23,30 @@ bool Trampoline::CopyInstructions(uint32_t* destination,
     return true;
 }
 
+
 bool Trampoline::RelocateInstruction(uint32_t* destination,
-                                     uintptr_t,
-                                     uintptr_t)
+                                     uintptr_t sourcePc,
+                                     uintptr_t destinationPc)
 {
-    (void)destination;
+    uint32_t instruction = *destination;
+
+    if (InstructionDecoder::IsBranch(instruction))
+    {
+        return false;
+    }
+
+    if (InstructionDecoder::IsLoadLiteral(instruction))
+    {
+        return false;
+    }
+
+    if (InstructionDecoder::IsPcRelative(instruction))
+    {
+        return false;
+    }
+
+    (void)sourcePc;
+    (void)destinationPc;
 
     return true;
 }
