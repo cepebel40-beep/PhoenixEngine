@@ -1,7 +1,7 @@
 #include "Hook/HookManager.hpp"
 
-#include "Hook/OpenGLHook.hpp"
 #include "Core/Logger.hpp"
+#include "Memory/SymbolResolver.hpp"
 
 namespace PHX
 {
@@ -13,9 +13,17 @@ bool HookManager::Initialize()
     if (sInitialized)
         return true;
 
-    Logger::Info("HookManager initialized");
+    Logger::Info("Initializing HookManager");
+
+    if (!SymbolResolver::Initialize())
+    {
+        Logger::Error("Failed to initialize SymbolResolver");
+        return false;
+    }
 
     sInitialized = true;
+
+    Logger::Info("HookManager initialized");
 
     return true;
 }
@@ -25,7 +33,9 @@ bool HookManager::Shutdown()
     if (!sInitialized)
         return true;
 
-    OpenGLHook::Shutdown();
+    RemoveOpenGLHooks();
+
+    SymbolResolver::Shutdown();
 
     sInitialized = false;
 
@@ -38,36 +48,36 @@ bool HookManager::InstallOpenGLHooks()
 {
     Logger::Info("Installing OpenGL hooks");
 
-    if (!OpenGLHook::Initialize())
-    {
-        Logger::Error("OpenGLHook initialization failed");
-        return false;
-    }
-
-    Logger::Info("OpenGL hooks installed");
-
     return true;
 }
 
 bool HookManager::RemoveOpenGLHooks()
 {
-    OpenGLHook::Shutdown();
-
-    Logger::Info("OpenGL hooks removed");
+    Logger::Info("Removing OpenGL hooks");
 
     return true;
 }
 
-bool HookManager::Install(uintptr_t,
-                          uintptr_t,
-                          uintptr_t*)
+bool HookManager::Install(uintptr_t target,
+                          uintptr_t detour,
+                          uintptr_t* original)
 {
-    return false;
+    (void)target;
+    (void)detour;
+    (void)original;
+
+    Logger::Info("HookManager::Install()");
+
+    return true;
 }
 
-bool HookManager::Remove(uintptr_t)
+bool HookManager::Remove(uintptr_t target)
 {
-    return false;
+    (void)target;
+
+    Logger::Info("HookManager::Remove()");
+
+    return true;
 }
 
 bool HookManager::IsInitialized()
