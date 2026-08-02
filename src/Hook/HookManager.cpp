@@ -1,5 +1,6 @@
 #include "Hook/HookManager.hpp"
 
+#include "Hook/OpenGLHook.hpp"
 #include "Core/Logger.hpp"
 
 namespace PHX
@@ -24,7 +25,7 @@ bool HookManager::Shutdown()
     if (!sInitialized)
         return true;
 
-    RemoveOpenGLHooks();
+    OpenGLHook::Shutdown();
 
     sInitialized = false;
 
@@ -35,14 +36,24 @@ bool HookManager::Shutdown()
 
 bool HookManager::InstallOpenGLHooks()
 {
-    Logger::Info("Installing OpenGL hooks...");
+    Logger::Info("Installing OpenGL hooks");
+
+    if (!OpenGLHook::Initialize())
+    {
+        Logger::Error("OpenGLHook initialization failed");
+        return false;
+    }
+
+    Logger::Info("OpenGL hooks installed");
 
     return true;
 }
 
 bool HookManager::RemoveOpenGLHooks()
 {
-    Logger::Info("Removing OpenGL hooks...");
+    OpenGLHook::Shutdown();
+
+    Logger::Info("OpenGL hooks removed");
 
     return true;
 }
