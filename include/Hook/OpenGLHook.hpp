@@ -20,6 +20,11 @@ extern void (*Original_glDrawElements)(
     GLenum,
     const void*);
 
+extern void (*Original_glDrawArrays)(
+    GLenum,
+    GLint,
+    GLsizei);
+
 void Hook_glUseProgram(GLuint program);
 
 void Hook_glBindTexture(
@@ -31,5 +36,10 @@ void Hook_glDrawElements(
     GLsizei count,
     GLenum type,
     const void* indices);
+
+void Hook_glDrawArrays(
+    GLenum mode,
+    GLint first,
+    GLsizei count);
 
 }
