@@ -20,7 +20,7 @@ void Hook_glUseProgram(GLuint program)
         sFirstProgram = false;
     }
 
-    Renderer::RenderFrame();
+    RenderFrame();
 
     if (Original_glUseProgram)
     {
