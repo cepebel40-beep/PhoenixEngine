@@ -43,6 +43,8 @@ void Hook_glUseProgram(GLuint program)
 
         RenderContext::SetProgram(program);
 
+        // Sementara masih di sini.
+        // Nanti akan dipindahkan ke eglSwapBuffers().
         RenderContext::BeginFrame();
     }
 
@@ -58,9 +60,12 @@ void Hook_glBindTexture(
 {
     RenderContext::SetTexture(texture);
 
-
     if (Original_glBindTexture)
-        Original_glBindTexture(target, texture);
+    {
+        Original_glBindTexture(
+            target,
+            texture);
+    }
 }
 
 void Hook_glDrawElements(
@@ -71,8 +76,6 @@ void Hook_glDrawElements(
 {
     RenderContext::IncrementDrawCall();
 
-    RenderFrame();
-
     if (Original_glDrawElements)
     {
         Original_glDrawElements(
@@ -81,6 +84,8 @@ void Hook_glDrawElements(
             type,
             indices);
     }
+
+    RenderFrame();
 }
 
 void Hook_glDrawArrays(
@@ -90,8 +95,6 @@ void Hook_glDrawArrays(
 {
     RenderContext::IncrementDrawCall();
 
-    RenderFrame();
-
     if (Original_glDrawArrays)
     {
         Original_glDrawArrays(
@@ -99,6 +102,8 @@ void Hook_glDrawArrays(
             first,
             count);
     }
+
+    RenderFrame();
 }
 
 bool InstallOpenGLHooks()
@@ -112,12 +117,17 @@ bool InstallOpenGLHooks()
 
     if (useProgram)
     {
-        success &= HookManager::Install(
-            useProgram,
-            reinterpret_cast<uintptr_t>(
-                &Hook_glUseProgram),
-            reinterpret_cast<uintptr_t*>(
-                &Original_glUseProgram));
+        if (!HookManager::Install(
+                useProgram,
+                reinterpret_cast<uintptr_t>(
+                    &Hook_glUseProgram),
+                reinterpret_cast<uintptr_t*>(
+                    &Original_glUseProgram)))
+        {
+            Logger::Error(
+                "Failed to hook glUseProgram");
+            success = false;
+        }
     }
 
     auto bindTexture =
@@ -127,12 +137,17 @@ bool InstallOpenGLHooks()
 
     if (bindTexture)
     {
-        success &= HookManager::Install(
-            bindTexture,
-            reinterpret_cast<uintptr_t>(
-                &Hook_glBindTexture),
-            reinterpret_cast<uintptr_t*>(
-                &Original_glBindTexture));
+        if (!HookManager::Install(
+                bindTexture,
+                reinterpret_cast<uintptr_t>(
+                    &Hook_glBindTexture),
+                reinterpret_cast<uintptr_t*>(
+                    &Original_glBindTexture)))
+        {
+            Logger::Error(
+                "Failed to hook glBindTexture");
+            success = false;
+        }
     }
 
     auto drawElements =
@@ -142,12 +157,17 @@ bool InstallOpenGLHooks()
 
     if (drawElements)
     {
-        success &= HookManager::Install(
-            drawElements,
-            reinterpret_cast<uintptr_t>(
-                &Hook_glDrawElements),
-            reinterpret_cast<uintptr_t*>(
-                &Original_glDrawElements));
+        if (!HookManager::Install(
+                drawElements,
+                reinterpret_cast<uintptr_t>(
+                    &Hook_glDrawElements),
+                reinterpret_cast<uintptr_t*>(
+                    &Original_glDrawElements)))
+        {
+            Logger::Error(
+                "Failed to hook glDrawElements");
+            success = false;
+        }
     }
 
     auto drawArrays =
@@ -157,16 +177,24 @@ bool InstallOpenGLHooks()
 
     if (drawArrays)
     {
-        success &= HookManager::Install(
-            drawArrays,
-            reinterpret_cast<uintptr_t>(
-                &Hook_glDrawArrays),
-            reinterpret_cast<uintptr_t*>(
-                &Original_glDrawArrays));
+        if (!HookManager::Install(
+                drawArrays,
+                reinterpret_cast<uintptr_t>(
+                    &Hook_glDrawArrays),
+                reinterpret_cast<uintptr_t*>(
+                    &Original_glDrawArrays)))
+        {
+            Logger::Error(
+                "Failed to hook glDrawArrays");
+            success = false;
+        }
     }
 
     if (success)
-        Logger::Info("OpenGL hook stage 8 synchronized with RenderContext");
+    {
+        Logger::Info(
+            "OpenGL Hook Stage 9 ready");
+    }
 
     return success;
 }
