@@ -1,13 +1,21 @@
 #include "Graphics/ShaderReplacer.hpp"
-
-#include "Graphics/ShaderInterceptor.hpp"
+#include "Graphics/ShaderLoader.hpp"
 
 #include "Core/Logger.hpp"
 
-#include <GLES3/gl3.h>
-
 namespace PHX
 {
+
+static bool LoadReplacementShader(
+    const char* path,
+    std::string& output)
+{
+    ShaderLoader loader;
+
+    return loader.ReadTextFile(
+        path,
+        output);
+}
 
 bool ShaderReplacer::Initialize()
 {
@@ -26,56 +34,19 @@ void ShaderReplacer::Shutdown()
 std::string ShaderReplacer::Replace(
     const std::string& source)
 {
-    if (source.empty())
+    std::string replacement;
+
+    if (LoadReplacementShader(
+            "gta/files/phoenix/shaders/ps/default.ps",
+            replacement))
     {
-        return source;
+        Logger::Info(
+            "Replacement shader loaded.");
+
+        return replacement;
     }
 
     return source;
-}
-
-std::string ShaderReplacer::ReplaceShader(
-    GLuint shader)
-{
-    if (!ShaderInterceptor::HasSource(shader))
-    {
-        return "";
-    }
-
-    std::string source =
-        ShaderInterceptor::GetSource(shader);
-
-    GLenum type =
-        ShaderInterceptor::GetType(shader);
-
-    switch (type)
-    {
-        case GL_VERTEX_SHADER:
-        {
-            Logger::Info(
-                "Vertex shader detected");
-
-            break;
-        }
-
-        case GL_FRAGMENT_SHADER:
-        {
-            Logger::Info(
-                "Fragment shader detected");
-
-            break;
-        }
-
-        default:
-        {
-            Logger::Info(
-                "Unknown shader type");
-
-            break;
-        }
-    }
-
-    return Replace(source);
 }
 
 }
