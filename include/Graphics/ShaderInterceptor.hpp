@@ -46,14 +46,15 @@ public:
     static GLenum GetType(
         GLuint shader);
 
+    static GLuint GetAttachedShader(
+        GLuint program);
+
 private:
 
     struct ShaderInfo
     {
         GLenum type;
-
         std::string source;
-
         bool compiled;
     };
 
