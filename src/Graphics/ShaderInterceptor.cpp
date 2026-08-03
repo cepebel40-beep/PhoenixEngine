@@ -15,10 +15,16 @@ std::unordered_map<
     GLuint>
 ShaderInterceptor::sAttachedShaders;
 
+std::unordered_map<
+    GLuint,
+    bool>
+ShaderInterceptor::sLinkedPrograms;
+
 bool ShaderInterceptor::Initialize()
 {
     sShaders.clear();
     sAttachedShaders.clear();
+    sLinkedPrograms.clear();
 
     Logger::Info(
         "ShaderInterceptor initialized");
@@ -33,6 +39,7 @@ void ShaderInterceptor::Shutdown()
 
     sShaders.clear();
     sAttachedShaders.clear();
+    sLinkedPrograms.clear();
 
     Logger::Info(
         "ShaderInterceptor shutdown");
@@ -93,8 +100,10 @@ void ShaderInterceptor::OnAttachShader(
 }
 
 void ShaderInterceptor::OnLinkProgram(
-    GLuint)
+    GLuint program)
 {
+    sLinkedPrograms[program] = true;
+
     Logger::Info(
         "LinkProgram intercepted");
 }
@@ -135,6 +144,17 @@ GLuint ShaderInterceptor::GetAttachedShader(
 
     if (it == sAttachedShaders.end())
         return 0;
+
+    return it->second;
+}
+
+bool ShaderInterceptor::IsProgramLinked(
+    GLuint program)
+{
+    auto it = sLinkedPrograms.find(program);
+
+    if (it == sLinkedPrograms.end())
+        return false;
 
     return it->second;
 }
