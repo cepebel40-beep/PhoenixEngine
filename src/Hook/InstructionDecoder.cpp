@@ -20,7 +20,7 @@ bool InstructionDecoder::IsLoadLiteral(uint32_t instruction)
 
 bool InstructionDecoder::IsPcRelative(uint32_t instruction)
 {
-    return IsAdr(instruction) || IsAdrp(instruction);
+    return IsADR(instruction) || IsADRP(instruction);
 }
 
 bool InstructionDecoder::IsBranchLink(uint32_t instruction)
@@ -28,12 +28,12 @@ bool InstructionDecoder::IsBranchLink(uint32_t instruction)
     return (instruction & 0xFC000000) == 0x94000000;
 }
 
-bool InstructionDecoder::IsAdr(uint32_t instruction)
+bool InstructionDecoder::IsADR(uint32_t instruction)
 {
     return (instruction & 0x9F000000) == 0x10000000;
 }
 
-bool InstructionDecoder::IsAdrp(uint32_t instruction)
+bool InstructionDecoder::IsADRP(uint32_t instruction)
 {
     return (instruction & 0x9F000000) == 0x90000000;
 }
