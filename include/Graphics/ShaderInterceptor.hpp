@@ -51,13 +51,19 @@ private:
     struct ShaderInfo
     {
         GLenum type;
+
         std::string source;
+
         bool compiled;
     };
 
     static std::unordered_map<
         GLuint,
         ShaderInfo> sShaders;
+
+    static std::unordered_map<
+        GLuint,
+        GLuint> sAttachedShaders;
 };
 
 }
