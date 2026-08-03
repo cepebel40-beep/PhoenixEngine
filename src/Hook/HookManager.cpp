@@ -11,15 +11,34 @@
 namespace PHX
 {
 
+constexpr size_t kTrampolineSize = 64;
+
 bool HookManager::sInitialized = false;
 
 static HookManager::HookEntry gHook =
 {
-    0,
-    0,
-    0,
-    false
+    0,      // target
+    0,      // detour
+    0,      // trampoline
+    false   // installed
 };
+
+static void* AllocateExecutableMemory(size_t size)
+{
+    return mmap(
+        nullptr,
+        size,
+        PROT_READ | PROT_WRITE | PROT_EXEC,
+        MAP_PRIVATE | MAP_ANONYMOUS,
+        -1,
+        0);
+}
+
+static void FreeExecutableMemory(void* memory)
+{
+    if (memory)
+        munmap(memory, kTrampolineSize);
+}
 
 bool HookManager::Initialize()
 {
@@ -48,6 +67,14 @@ bool HookManager::Shutdown()
 
     RemoveOpenGLHooks();
 
+    if (gHook.trampoline)
+    {
+        FreeExecutableMemory(
+            reinterpret_cast<void*>(gHook.trampoline));
+
+        gHook.trampoline = 0;
+    }
+
     SymbolResolver::Shutdown();
 
     sInitialized = false;
@@ -75,8 +102,19 @@ bool HookManager::Install(
     if (!target || !detour)
         return false;
 
+    void* trampoline =
+        AllocateExecutableMemory(kTrampolineSize);
+
+    if (!trampoline)
+    {
+        Logger::Error("Failed to allocate trampoline");
+        return false;
+    }
+
     gHook.target = target;
     gHook.detour = detour;
+    gHook.trampoline =
+        reinterpret_cast<uintptr_t>(trampoline);
     gHook.installed = true;
 
     if (original)
@@ -94,6 +132,14 @@ bool HookManager::Remove(uintptr_t target)
 
     if (gHook.target != target)
         return false;
+
+    if (gHook.trampoline)
+    {
+        FreeExecutableMemory(
+            reinterpret_cast<void*>(gHook.trampoline));
+
+        gHook.trampoline = 0;
+    }
 
     gHook.installed = false;
 
