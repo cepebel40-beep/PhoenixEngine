@@ -1,4 +1,5 @@
 #include "Graphics/ShaderReplacer.hpp"
+#include "Graphics/ShaderInterceptor.hpp"
 
 #include "Core/Logger.hpp"
 
@@ -22,7 +23,26 @@ void ShaderReplacer::Shutdown()
 std::string ShaderReplacer::Replace(
     const std::string& source)
 {
+    if (source.empty())
+    {
+        return source;
+    }
+
     return source;
+}
+
+std::string ShaderReplacer::ReplaceShader(
+    GLuint shader)
+{
+    if (!ShaderInterceptor::HasSource(shader))
+    {
+        return "";
+    }
+
+    std::string source =
+        ShaderInterceptor::GetSource(shader);
+
+    return Replace(source);
 }
 
 }
