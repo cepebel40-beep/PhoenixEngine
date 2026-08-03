@@ -40,7 +40,10 @@ void Hook_glUseProgram(GLuint program)
     if (program != sCurrentProgram)
     {
         sCurrentProgram = program;
+
         RenderContext::SetProgram(program);
+
+        RenderContext::BeginFrame();
     }
 
     if (Original_glUseProgram)
@@ -55,6 +58,8 @@ void Hook_glBindTexture(
 {
     RenderContext::SetTexture(texture);
 
+    RenderContext::IncrementDrawCall();
+
     if (Original_glBindTexture)
         Original_glBindTexture(target, texture);
 }
@@ -65,6 +70,8 @@ void Hook_glDrawElements(
     GLenum type,
     const void* indices)
 {
+    RenderContext::IncrementDrawCall();
+
     RenderFrame();
 
     if (Original_glDrawElements)
@@ -82,6 +89,8 @@ void Hook_glDrawArrays(
     GLint first,
     GLsizei count)
 {
+    RenderContext::IncrementDrawCall();
+
     RenderFrame();
 
     if (Original_glDrawArrays)
@@ -158,7 +167,7 @@ bool InstallOpenGLHooks()
     }
 
     if (success)
-        Logger::Info("OpenGL hook stage 6 ready");
+        Logger::Info("OpenGL hook stage 8 synchronized with RenderContext");
 
     return success;
 }
@@ -199,6 +208,8 @@ bool RemoveOpenGLHooks()
 
     if (drawArrays)
         HookManager::Remove(drawArrays);
+
+    RenderContext::Reset();
 
     Logger::Info("OpenGL hooks removed");
 
