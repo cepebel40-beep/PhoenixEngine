@@ -1,7 +1,9 @@
 #include "Graphics/Renderer.hpp"
+
 #include "Graphics/ShaderManager.hpp"
-#include "Core/Logger.hpp"
 #include "Graphics/RenderState.hpp"
+#include "Core/Logger.hpp"
+
 #include <GLES3/gl3.h>
 
 namespace PHX
@@ -21,14 +23,14 @@ bool InitializeRenderer()
         return false;
     }
 
-        gProgram = gShaderManager.GetProgram();
+    gProgram = gShaderManager.GetProgram();
 
-        RenderState::SetProgram(gProgram);
+    RenderState::SetProgram(gProgram);
 
     if (gProgram == 0)
     {
         Logger::Error("Shader program is invalid.");
-       return false;
+        return false;
     }
 
     glUseProgram(gProgram);
@@ -46,6 +48,14 @@ void RenderFrame()
     if (!sRendererReady)
         return;
 
+    /*
+        TODO:
+        Saat OpenGL Hook sudah final,
+        glUseProgram() di sini akan diganti menggunakan
+        Original_glUseProgram()
+        agar tidak terjadi recursive hook.
+    */
+
     if (gProgram != 0)
     {
         glUseProgram(gProgram);
@@ -62,6 +72,9 @@ void ShutdownRenderer()
     gShaderManager.Destroy();
 
     gProgram = 0;
+
+    RenderState::Reset();
+
     sRendererReady = false;
 
     Logger::Info("Renderer shutdown complete.");
