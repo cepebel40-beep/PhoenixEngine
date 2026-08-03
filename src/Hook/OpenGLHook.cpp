@@ -28,6 +28,12 @@ void Hook_glUseProgram(GLuint program)
         RenderContext::SetProgram(program);
     }
 
+    /*
+     * Panggil OpenGL asli terlebih dahulu.
+     * Renderer nantinya juga akan memakai
+     * Original_glUseProgram agar tidak
+     * terjadi recursive hook.
+     */
     if (Original_glUseProgram)
     {
         Original_glUseProgram(program);
@@ -57,7 +63,7 @@ bool InstallOpenGLHooks()
         return false;
     }
 
-    Logger::Info("glUseProgram hooked");
+    Logger::Info("glUseProgram hook installed");
 
     return true;
 }
@@ -73,6 +79,8 @@ bool RemoveOpenGLHooks()
 
     sCurrentProgram = 0;
     sFirstProgram = true;
+
+    Logger::Info("Removing glUseProgram hook");
 
     return HookManager::Remove(target);
 }
