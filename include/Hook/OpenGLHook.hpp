@@ -15,6 +15,12 @@ bool RemoveOpenGLHooks();
 extern GLuint (*Original_glCreateShader)(
     GLenum type);
 
+extern void (*Original_glShaderSource)(
+    GLuint shader,
+    GLsizei count,
+    const GLchar* const* string,
+    const GLint* length);
+
 extern void (*Original_glUseProgram)(
     GLuint program);
 
@@ -39,6 +45,12 @@ extern void (*Original_glDrawArrays)(
 
 GLuint Hook_glCreateShader(
     GLenum type);
+
+void Hook_glShaderSource(
+    GLuint shader,
+    GLsizei count,
+    const GLchar* const* string,
+    const GLint* length);
 
 void Hook_glUseProgram(
     GLuint program);
