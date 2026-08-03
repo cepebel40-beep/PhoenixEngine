@@ -11,6 +11,7 @@ namespace PHX
 void (*Original_glUseProgram)(GLuint) = nullptr;
 
 static bool sFirstProgram = true;
+static GLuint sCurrentProgram = 0;
 
 void Hook_glUseProgram(GLuint program)
 {
@@ -20,7 +21,11 @@ void Hook_glUseProgram(GLuint program)
         sFirstProgram = false;
     }
 
-    RenderFrame();
+    if (program != sCurrentProgram)
+    {
+        sCurrentProgram = program;
+        RenderFrame();
+    }
 
     if (Original_glUseProgram)
     {
@@ -62,6 +67,9 @@ bool RemoveOpenGLHooks()
 
     if (!target)
         return false;
+
+    sCurrentProgram = 0;
+    sFirstProgram = true;
 
     return HookManager::Remove(target);
 }
