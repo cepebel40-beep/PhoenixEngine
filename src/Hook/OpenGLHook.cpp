@@ -4,6 +4,7 @@
 #include "Memory/SymbolResolver.hpp"
 #include "Hook/HookManager.hpp"
 #include "Graphics/Renderer.hpp"
+#include "Graphics/RenderContext.hpp"
 
 namespace PHX
 {
@@ -24,13 +25,15 @@ void Hook_glUseProgram(GLuint program)
     if (program != sCurrentProgram)
     {
         sCurrentProgram = program;
-        RenderFrame();
+        RenderContext::SetProgram(program);
     }
 
     if (Original_glUseProgram)
     {
         Original_glUseProgram(program);
     }
+
+    RenderFrame();
 }
 
 bool InstallOpenGLHooks()
