@@ -1,8 +1,6 @@
 #pragma once
 
 #include <GLES3/gl3.h>
-#include <string>
-#include <unordered_map>
 
 namespace PHX
 {
@@ -10,16 +8,18 @@ namespace PHX
 class ShaderCache
 {
 public:
-    static bool Has(const std::string& name);
 
-    static GLuint Get(const std::string& name);
+    static bool Initialize();
 
-    static void Store(const std::string& name, GLuint program);
+    static void Shutdown();
 
-    static void Clear();
+    static void SetCurrentProgram(GLuint program);
+
+    static GLuint GetCurrentProgram();
 
 private:
-    static std::unordered_map<std::string, GLuint> mPrograms;
+
+    static GLuint sCurrentProgram;
 };
 
 }
