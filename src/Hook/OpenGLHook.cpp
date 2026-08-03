@@ -58,7 +58,6 @@ void Hook_glBindTexture(
 {
     RenderContext::SetTexture(texture);
 
-    RenderContext::IncrementDrawCall();
 
     if (Original_glBindTexture)
         Original_glBindTexture(target, texture);
