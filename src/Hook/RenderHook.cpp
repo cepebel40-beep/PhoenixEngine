@@ -1,36 +1,50 @@
 #include "Hook/RenderHook.hpp"
-#include "Core/Logger.hpp"
 
-#include <GLES3/gl3.h>
+#include "Core/Logger.hpp"
+#include "Graphics/Renderer.hpp"
 
 namespace PHX
 {
 
-static bool gRendererInstalled = false;
+static bool sInstalled = false;
 
 bool InstallRenderHooks()
 {
-    if (gRendererInstalled)
-    {
-        Logger::Info("Render hooks already installed");
+    if (sInstalled)
         return true;
-    }
 
     Logger::Info("Installing Render hooks");
 
-    glDisable(GL_DITHER);
+    /*
+        Tahap berikutnya:
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+        eglSwapBuffers
+              │
+              ▼
+        Phoenix Hook
+              │
+              ▼
+        Renderer::RenderFrame()
 
-    glFrontFace(GL_CCW);
+        Untuk saat ini kita hanya menyiapkan pondasinya
+        agar build tetap hijau.
+    */
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-
-    gRendererInstalled = true;
+    sInstalled = true;
 
     Logger::Info("Render hooks installed");
+
+    return true;
+}
+
+bool RemoveRenderHooks()
+{
+    if (!sInstalled)
+        return true;
+
+    sInstalled = false;
+
+    Logger::Info("Render hooks removed");
 
     return true;
 }
