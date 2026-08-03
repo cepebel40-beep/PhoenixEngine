@@ -35,35 +35,52 @@ bool Relocator::Prepare(uintptr_t source,
 
 bool Relocator::Relocate()
 {
-    auto* src =
-        reinterpret_cast<uint32_t*>(m_source);
+    auto* src = reinterpret_cast<uint32_t*>(m_source);
+    auto* dst = reinterpret_cast<uint32_t*>(m_destination);
 
-    auto* dst =
-        reinterpret_cast<uint32_t*>(m_destination);
-
-    for (size_t i = 0; i < m_instructionCount; i++)
+    for (size_t i = 0; i < m_instructionCount; ++i)
     {
+        uintptr_t sourcePc =
+            m_source + (i * sizeof(uint32_t));
+
+        uintptr_t destinationPc =
+            m_destination + (i * sizeof(uint32_t));
+
         uint32_t instruction =
-            InstructionDecoder::Read(
-                reinterpret_cast<uintptr_t>(&src[i]));
+            InstructionDecoder::Read(sourcePc);
 
         /*
-         * Stage 2
+         * Stage 3
          *
-         * Untuk sementara seluruh instruksi
-         * masih dicopy apa adanya.
-         *
-         * Commit berikutnya akan mulai
-         * me-relocate:
-         *
-         * ADR
-         * ADRP
-         * B
-         * BL
-         * LDR Literal
+         * Untuk sementara:
+         * - Instruksi biasa langsung dicopy.
+         * - Instruksi PC-relative dikenali.
+         * - Relocation sebenarnya akan dibuat
+         *   pada commit berikutnya.
          */
 
+        if (InstructionDecoder::IsPcRelative(instruction))
+        {
+            dst[i] = instruction;
+            continue;
+        }
+
+        if (InstructionDecoder::IsBranch(instruction))
+        {
+            dst[i] = instruction;
+            continue;
+        }
+
+        if (InstructionDecoder::IsLoadLiteral(instruction))
+        {
+            dst[i] = instruction;
+            continue;
+        }
+
         dst[i] = instruction;
+
+        (void)sourcePc;
+        (void)destinationPc;
     }
 
     return true;
