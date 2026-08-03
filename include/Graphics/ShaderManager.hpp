@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GLES3/gl3.h>
-#include <string>
 
 namespace PHX
 {
@@ -9,23 +8,25 @@ namespace PHX
 class ShaderManager
 {
 public:
-    ShaderManager();
-
-    ~ShaderManager();
 
     bool Initialize();
 
-    GLuint LoadShader(GLenum type,
-                      const std::string& source);
-
-    GLuint CreateProgram(const std::string& vertexSource,
-                         const std::string& fragmentSource);
+    void Destroy();
 
     GLuint GetProgram() const;
 
-    void Destroy();
+private:
+
+    bool CreateVertexShader();
+
+    bool CreateFragmentShader();
+
+    bool LinkProgram();
 
 private:
+
+    GLuint mVertexShader = 0;
+    GLuint mFragmentShader = 0;
     GLuint mProgram = 0;
 };
 
