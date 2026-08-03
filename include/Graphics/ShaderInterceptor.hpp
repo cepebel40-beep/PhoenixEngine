@@ -34,20 +34,24 @@ public:
     static void OnLinkProgram(
         GLuint program);
 
-    static bool HasSource(GLuint shader);
+    static bool HasSource(
+        GLuint shader);
 
-    static std::string GetSource(GLuint shader);
+    static bool IsCompiled(
+        GLuint shader);
 
-    static GLenum GetType(GLuint shader);
+    static std::string GetSource(
+        GLuint shader);
+
+    static GLenum GetType(
+        GLuint shader);
 
 private:
 
     struct ShaderInfo
     {
         GLenum type;
-
         std::string source;
-
         bool compiled;
     };
 
