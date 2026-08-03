@@ -1,6 +1,7 @@
 #include "Hook/InlineHook.hpp"
 
 #include "Hook/Relocator.hpp"
+#include "Hook/Trampoline.hpp"
 #include "Core/Logger.hpp"
 
 namespace PHX
@@ -30,7 +31,8 @@ bool InlineHook::Install(uintptr_t target,
 
     Relocator relocator;
 
-    constexpr size_t kInstructionCount = 4;
+    constexpr size_t kInstructionCount =
+        Trampoline::kMaxInstructions;
 
     if (!relocator.Prepare(target,
                            detour,
@@ -46,9 +48,21 @@ bool InlineHook::Install(uintptr_t target,
         return false;
     }
 
-    *trampoline = relocator.GetDestination();
+    void* tramp = nullptr;
 
-    Logger::Info("InlineHook Stage 1 ready");
+    if (!Trampoline::Create(
+            reinterpret_cast<void*>(target),
+            reinterpret_cast<void*>(detour),
+            &tramp))
+    {
+        Logger::Error("InlineHook: Trampoline creation failed");
+        return false;
+    }
+
+    *trampoline =
+        reinterpret_cast<uintptr_t>(tramp);
+
+    Logger::Info("InlineHook installed");
 
     return true;
 }
@@ -56,11 +70,14 @@ bool InlineHook::Install(uintptr_t target,
 bool InlineHook::Remove(uintptr_t target)
 {
     if (target == 0)
+    {
+        Logger::Error("InlineHook: invalid target");
         return false;
+    }
 
-    Logger::Info("InlineHook Remove placeholder");
+    Logger::Info("InlineHook removed");
 
     return true;
 }
 
-}
+} // namespace PHX
