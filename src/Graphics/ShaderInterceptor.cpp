@@ -18,6 +18,7 @@ ShaderInterceptor::sAttachedShaders;
 bool ShaderInterceptor::Initialize()
 {
     sShaders.clear();
+    sAttachedShaders.clear();
 
     Logger::Info(
         "ShaderInterceptor initialized");
@@ -31,6 +32,7 @@ void ShaderInterceptor::Shutdown()
         "ShaderInterceptor shutting down");
 
     sShaders.clear();
+    sAttachedShaders.clear();
 
     Logger::Info(
         "ShaderInterceptor shutdown");
@@ -117,6 +119,24 @@ bool ShaderInterceptor::IsCompiled(
         return false;
 
     return it->second.compiled;
+}
+
+bool ShaderInterceptor::HasAttachedShader(
+    GLuint program)
+{
+    return sAttachedShaders.find(program)
+        != sAttachedShaders.end();
+}
+
+GLuint ShaderInterceptor::GetAttachedShader(
+    GLuint program)
+{
+    auto it = sAttachedShaders.find(program);
+
+    if (it == sAttachedShaders.end())
+        return 0;
+
+    return it->second;
 }
 
 std::string ShaderInterceptor::GetSource(
