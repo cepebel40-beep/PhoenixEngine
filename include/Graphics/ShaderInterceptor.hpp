@@ -46,6 +46,9 @@ public:
     static GLuint GetAttachedShader(
         GLuint program);
 
+    static bool IsProgramLinked(
+        GLuint program);
+
     static std::string GetSource(
         GLuint shader);
 
@@ -57,7 +60,9 @@ private:
     struct ShaderInfo
     {
         GLenum type;
+
         std::string source;
+
         bool compiled;
     };
 
@@ -68,6 +73,10 @@ private:
     static std::unordered_map<
         GLuint,
         GLuint> sAttachedShaders;
+
+    static std::unordered_map<
+        GLuint,
+        bool> sLinkedPrograms;
 };
 
 }
