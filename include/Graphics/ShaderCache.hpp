@@ -27,6 +27,10 @@ public:
     static void Store(const std::string& name,
                       GLuint program);
 
+    static void Remove(GLuint program);
+
+    static void Clear();
+
 private:
 
     static GLuint sCurrentProgram;
