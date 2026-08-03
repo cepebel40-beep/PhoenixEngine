@@ -23,9 +23,7 @@ bool ShaderCache::Initialize()
 
 void ShaderCache::Shutdown()
 {
-    sPrograms.clear();
-
-    sCurrentProgram = 0;
+    Clear();
 
     Logger::Info("ShaderCache shutdown");
 }
@@ -59,6 +57,28 @@ void ShaderCache::Store(const std::string& name,
                         GLuint program)
 {
     sPrograms[name] = program;
+}
+
+void ShaderCache::Remove(GLuint program)
+{
+    for (auto it = sPrograms.begin();
+         it != sPrograms.end();)
+    {
+        if (it->second == program)
+            it = sPrograms.erase(it);
+        else
+            ++it;
+    }
+
+    if (sCurrentProgram == program)
+        sCurrentProgram = 0;
+}
+
+void ShaderCache::Clear()
+{
+    sPrograms.clear();
+
+    sCurrentProgram = 0;
 }
 
 }
