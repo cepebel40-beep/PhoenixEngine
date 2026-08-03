@@ -3,14 +3,25 @@
 #include "Core/Logger.hpp"
 #include "Memory/SymbolResolver.hpp"
 #include "Hook/HookManager.hpp"
+#include "Graphics/Renderer.hpp"
 
 namespace PHX
 {
 
 void (*Original_glUseProgram)(GLuint) = nullptr;
 
+static bool sFirstProgram = true;
+
 void Hook_glUseProgram(GLuint program)
 {
+    if (sFirstProgram)
+    {
+        Logger::Info("First OpenGL shader program detected");
+        sFirstProgram = false;
+    }
+
+    Renderer::RenderFrame();
+
     if (Original_glUseProgram)
     {
         Original_glUseProgram(program);
