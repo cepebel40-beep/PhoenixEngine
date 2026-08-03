@@ -22,6 +22,10 @@ bool ShaderInterceptor::Initialize()
 
 void ShaderInterceptor::Shutdown()
 {
+    Logger::Info(
+        "Tracked shaders: %zu",
+        sShaders.size());
+
     sShaders.clear();
 
     Logger::Info(
@@ -38,6 +42,11 @@ void ShaderInterceptor::OnCreateShader(
     info.compiled = false;
 
     sShaders[shader] = info;
+
+    Logger::Info(
+        "CreateShader id=%u type=%u",
+        shader,
+        type);
 }
 
 void ShaderInterceptor::OnShaderSource(
@@ -50,6 +59,11 @@ void ShaderInterceptor::OnShaderSource(
         return;
 
     it->second.source = source;
+
+    Logger::Info(
+        "ShaderSource id=%u size=%zu",
+        shader,
+        source.size());
 }
 
 void ShaderInterceptor::OnCompileShader(
@@ -61,24 +75,39 @@ void ShaderInterceptor::OnCompileShader(
         return;
 
     it->second.compiled = true;
+
+    Logger::Info(
+        "CompileShader id=%u",
+        shader);
 }
 
 void ShaderInterceptor::OnAttachShader(
-    GLuint,
-    GLuint)
+    GLuint program,
+    GLuint shader)
 {
+    Logger::Info(
+        "AttachShader program=%u shader=%u",
+        program,
+        shader);
 }
 
 void ShaderInterceptor::OnLinkProgram(
-    GLuint)
+    GLuint program)
 {
+    Logger::Info(
+        "LinkProgram %u",
+        program);
 }
 
 bool ShaderInterceptor::HasSource(
     GLuint shader)
 {
-    return sShaders.find(shader)
-        != sShaders.end();
+    auto it = sShaders.find(shader);
+
+    if (it == sShaders.end())
+        return false;
+
+    return !it->second.source.empty();
 }
 
 std::string ShaderInterceptor::GetSource(
