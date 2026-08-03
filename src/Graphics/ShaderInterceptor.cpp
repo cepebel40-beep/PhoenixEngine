@@ -101,6 +101,17 @@ bool ShaderInterceptor::HasSource(
     return !it->second.source.empty();
 }
 
+bool ShaderInterceptor::IsCompiled(
+    GLuint shader)
+{
+    auto it = sShaders.find(shader);
+
+    if (it == sShaders.end())
+        return false;
+
+    return it->second.compiled;
+}
+
 std::string ShaderInterceptor::GetSource(
     GLuint shader)
 {
