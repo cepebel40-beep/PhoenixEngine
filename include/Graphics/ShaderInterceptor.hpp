@@ -40,14 +40,17 @@ public:
     static bool IsCompiled(
         GLuint shader);
 
+    static bool HasAttachedShader(
+        GLuint program);
+
+    static GLuint GetAttachedShader(
+        GLuint program);
+
     static std::string GetSource(
         GLuint shader);
 
     static GLenum GetType(
         GLuint shader);
-
-    static GLuint GetAttachedShader(
-        GLuint program);
 
 private:
 
