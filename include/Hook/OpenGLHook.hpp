@@ -8,7 +8,11 @@ namespace PHX
 bool InstallOpenGLHooks();
 bool RemoveOpenGLHooks();
 
-extern void (*Original_glCreateShader)(
+/*
+ * Original OpenGL functions
+ */
+
+extern GLuint (*Original_glCreateShader)(
     GLenum type);
 
 extern void (*Original_glUseProgram)(
@@ -28,6 +32,10 @@ extern void (*Original_glDrawArrays)(
     GLenum mode,
     GLint first,
     GLsizei count);
+
+/*
+ * Hook functions
+ */
 
 GLuint Hook_glCreateShader(
     GLenum type);
