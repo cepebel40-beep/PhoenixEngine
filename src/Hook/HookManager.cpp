@@ -11,33 +11,36 @@
 namespace PHX
 {
 
-constexpr size_t kTrampolineSize = 64;
-
 bool HookManager::sInitialized = false;
 
 static HookManager::HookEntry gHook =
 {
-    0,      // target
-    0,      // detour
-    0,      // trampoline
-    false   // installed
+    0,
+    0,
+    0,
+    false
 };
 
 static void* AllocateExecutableMemory(size_t size)
 {
-    return mmap(
+    void* memory = mmap(
         nullptr,
         size,
         PROT_READ | PROT_WRITE | PROT_EXEC,
         MAP_PRIVATE | MAP_ANONYMOUS,
         -1,
         0);
+
+    if (memory == MAP_FAILED)
+        return nullptr;
+
+    return memory;
 }
 
-static void FreeExecutableMemory(void* memory)
+static void FreeExecutableMemory(void* memory, size_t size)
 {
     if (memory)
-        munmap(memory, kTrampolineSize);
+        munmap(memory, size);
 }
 
 bool HookManager::Initialize()
@@ -67,14 +70,6 @@ bool HookManager::Shutdown()
 
     RemoveOpenGLHooks();
 
-    if (gHook.trampoline)
-    {
-        FreeExecutableMemory(
-            reinterpret_cast<void*>(gHook.trampoline));
-
-        gHook.trampoline = 0;
-    }
-
     SymbolResolver::Shutdown();
 
     sInitialized = false;
@@ -102,23 +97,30 @@ bool HookManager::Install(
     if (!target || !detour)
         return false;
 
-    void* trampoline =
-        AllocateExecutableMemory(kTrampolineSize);
+    constexpr size_t kTrampolineSize = 64;
+
+    void* trampoline = AllocateExecutableMemory(kTrampolineSize);
 
     if (!trampoline)
     {
-        Logger::Error("Failed to allocate trampoline");
+        Logger::Error("Failed to allocate executable trampoline");
         return false;
     }
 
+    std::memcpy(
+        trampoline,
+        reinterpret_cast<void*>(target),
+        16);
+
     gHook.target = target;
     gHook.detour = detour;
-    gHook.trampoline =
-        reinterpret_cast<uintptr_t>(trampoline);
+    gHook.trampoline = reinterpret_cast<uintptr_t>(trampoline);
     gHook.installed = true;
 
     if (original)
-        *original = target;
+        *original = gHook.trampoline;
+
+    Logger::Info("Executable trampoline allocated");
 
     Logger::Info("Hook installed (ARM64 stage)");
 
@@ -136,7 +138,8 @@ bool HookManager::Remove(uintptr_t target)
     if (gHook.trampoline)
     {
         FreeExecutableMemory(
-            reinterpret_cast<void*>(gHook.trampoline));
+            reinterpret_cast<void*>(gHook.trampoline),
+            64);
 
         gHook.trampoline = 0;
     }
