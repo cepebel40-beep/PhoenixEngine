@@ -1,7 +1,7 @@
 #include "Graphics/Renderer.hpp"
 #include "Graphics/ShaderManager.hpp"
 #include "Core/Logger.hpp"
-
+#include "Graphics/RenderState.hpp"
 #include <GLES3/gl3.h>
 
 namespace PHX
@@ -21,12 +21,14 @@ bool InitializeRenderer()
         return false;
     }
 
-    gProgram = gShaderManager.GetProgram();
+        gProgram = gShaderManager.GetProgram();
+
+        RenderState::SetProgram(gProgram);
 
     if (gProgram == 0)
     {
         Logger::Error("Shader program is invalid.");
-        return false;
+       return false;
     }
 
     glUseProgram(gProgram);
