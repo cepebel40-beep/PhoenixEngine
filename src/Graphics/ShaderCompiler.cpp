@@ -1,8 +1,7 @@
 #include "Graphics/ShaderCompiler.hpp"
+#include "Graphics/ShaderInterceptor.hpp"
 
 #include <android/log.h>
-#include <algorithm>
-#include <cctype>
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"Phoenix",__VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"Phoenix",__VA_ARGS__)
@@ -12,42 +11,27 @@ namespace PHX
 
 std::string ShaderCompiler::sLastError;
 
-static bool IsSourceEmpty(const std::string& source)
-{
-    return std::all_of(
-        source.begin(),
-        source.end(),
-        [](unsigned char c)
-        {
-            return std::isspace(c);
-        });
-}
-
 GLuint ShaderCompiler::Compile(
     GLenum type,
     const std::string& source)
 {
     sLastError.clear();
 
-    if (source.empty() || IsSourceEmpty(source))
-    {
-        sLastError = "Shader source is empty";
-
-        LOGE("%s", sLastError.c_str());
-
-        return 0;
-    }
-
     GLuint shader = glCreateShader(type);
 
-    if (shader == 0)
+    if(shader == 0)
     {
         sLastError = "glCreateShader failed";
-
-        LOGE("%s", sLastError.c_str());
-
         return 0;
     }
+
+    ShaderInterceptor::OnCreateShader(
+        shader,
+        type);
+
+    ShaderInterceptor::OnShaderSource(
+        shader,
+        source);
 
     const char* src = source.c_str();
 
@@ -66,7 +50,7 @@ GLuint ShaderCompiler::Compile(
         GL_COMPILE_STATUS,
         &success);
 
-    if (!success)
+    if(!success)
     {
         char log[2048]{};
 
@@ -78,15 +62,18 @@ GLuint ShaderCompiler::Compile(
 
         sLastError = log;
 
-        LOGE("%s", log);
+        LOGE("%s",log);
 
         glDeleteShader(shader);
 
         return 0;
     }
 
+    ShaderInterceptor::OnCompileShader(
+        shader);
+
     LOGI(
-        "Shader compiled successfully");
+        "Shader compiled");
 
     return shader;
 }
