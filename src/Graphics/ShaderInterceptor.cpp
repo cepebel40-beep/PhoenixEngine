@@ -10,6 +10,11 @@ std::unordered_map<
     ShaderInterceptor::ShaderInfo>
 ShaderInterceptor::sShaders;
 
+std::unordered_map<
+    GLuint,
+    GLuint>
+ShaderInterceptor::sAttachedShaders;
+
 bool ShaderInterceptor::Initialize()
 {
     sShaders.clear();
@@ -76,9 +81,11 @@ void ShaderInterceptor::OnCompileShader(
 }
 
 void ShaderInterceptor::OnAttachShader(
-    GLuint,
-    GLuint)
+    GLuint program,
+    GLuint shader)
 {
+    sAttachedShaders[program] = shader;
+
     Logger::Info(
         "AttachShader intercepted");
 }
