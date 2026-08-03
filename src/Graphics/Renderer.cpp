@@ -2,6 +2,7 @@
 
 #include "Graphics/ShaderManager.hpp"
 #include "Graphics/RenderState.hpp"
+#include "Hook/OpenGLHook.hpp"
 #include "Core/Logger.hpp"
 
 #include <GLES3/gl3.h>
@@ -33,7 +34,14 @@ bool InitializeRenderer()
         return false;
     }
 
-    glUseProgram(gProgram);
+    if (Original_glUseProgram)
+    {
+        Original_glUseProgram(gProgram);
+    }
+    else
+    {
+        glUseProgram(gProgram);
+    }
 
     sRendererReady = true;
 
@@ -48,15 +56,14 @@ void RenderFrame()
     if (!sRendererReady)
         return;
 
-    /*
-        TODO:
-        Saat OpenGL Hook sudah final,
-        glUseProgram() di sini akan diganti menggunakan
-        Original_glUseProgram()
-        agar tidak terjadi recursive hook.
-    */
+    if (gProgram == 0)
+        return;
 
-    if (gProgram != 0)
+    if (Original_glUseProgram)
+    {
+        Original_glUseProgram(gProgram);
+    }
+    else
     {
         glUseProgram(gProgram);
     }
