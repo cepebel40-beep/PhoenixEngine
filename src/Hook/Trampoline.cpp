@@ -1,5 +1,6 @@
 #include "Hook/Trampoline.hpp"
 #include "Hook/InstructionDecoder.hpp"
+
 #include <cstring>
 
 namespace PHX
@@ -22,7 +23,6 @@ bool Trampoline::CopyInstructions(uint32_t* destination,
 
     return true;
 }
-
 
 bool Trampoline::RelocateInstruction(uint32_t* destination,
                                      uintptr_t sourcePc,
@@ -62,3 +62,5 @@ void Trampoline::WriteAbsoluteJump(uint32_t* destination,
 
     *literal = static_cast<uint64_t>(address);
 }
+
+} // namespace PHX
