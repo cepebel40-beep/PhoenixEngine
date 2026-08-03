@@ -9,6 +9,7 @@ namespace PHX
 
 static ShaderManager gShaderManager;
 static GLuint gProgram = 0;
+static bool sRendererReady = false;
 
 bool InitializeRenderer()
 {
@@ -30,11 +31,23 @@ bool InitializeRenderer()
 
     glUseProgram(gProgram);
 
-    Logger::Info("Shader program activated.");
+    sRendererReady = true;
 
+    Logger::Info("Shader program activated.");
     Logger::Info("Renderer initialized successfully.");
 
     return true;
+}
+
+void RenderFrame()
+{
+    if (!sRendererReady)
+        return;
+
+    if (gProgram != 0)
+    {
+        glUseProgram(gProgram);
+    }
 }
 
 GLuint GetRendererProgram()
@@ -45,7 +58,9 @@ GLuint GetRendererProgram()
 void ShutdownRenderer()
 {
     gShaderManager.Destroy();
+
     gProgram = 0;
+    sRendererReady = false;
 
     Logger::Info("Renderer shutdown complete.");
 }
