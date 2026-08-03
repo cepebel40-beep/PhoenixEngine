@@ -8,6 +8,8 @@ namespace PHX
 class RenderState
 {
 public:
+    static bool Initialize();
+
     static void SetProgram(GLuint program);
     static GLuint GetProgram();
 
