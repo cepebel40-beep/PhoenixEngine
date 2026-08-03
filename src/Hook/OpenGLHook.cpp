@@ -5,9 +5,12 @@
 #include "Hook/HookManager.hpp"
 #include "Graphics/Renderer.hpp"
 #include "Graphics/RenderContext.hpp"
+#include "Graphics/ShaderInterceptor.hpp"
 
 namespace PHX
 {
+
+GLuint (*Original_glCreateShader)(GLenum) = nullptr;
 
 void (*Original_glUseProgram)(GLuint) = nullptr;
 
@@ -29,11 +32,36 @@ void (*Original_glDrawArrays)(
 static bool sFirstProgram = true;
 static GLuint sCurrentProgram = 0;
 
+GLuint Hook_glCreateShader(GLenum type)
+{
+    GLuint shader = 0;
+
+    if (Original_glCreateShader)
+    {
+        shader =
+            Original_glCreateShader(type);
+    }
+
+    if (shader != 0)
+    {
+        ShaderInterceptor::OnCreateShader(
+            shader,
+            type);
+
+        Logger::Info(
+            "glCreateShader intercepted");
+    }
+
+    return shader;
+}
+
 void Hook_glUseProgram(GLuint program)
 {
     if (sFirstProgram)
     {
-        Logger::Info("First OpenGL shader detected");
+        Logger::Info(
+            "First OpenGL shader detected");
+
         sFirstProgram = false;
     }
 
@@ -41,15 +69,17 @@ void Hook_glUseProgram(GLuint program)
     {
         sCurrentProgram = program;
 
-        RenderContext::SetProgram(program);
+        RenderContext::SetProgram(
+            program);
 
-        // Sementara masih di sini.
-        // Nanti akan dipindahkan ke eglSwapBuffers().
         RenderContext::BeginFrame();
     }
 
     if (Original_glUseProgram)
-        Original_glUseProgram(program);
+    {
+        Original_glUseProgram(
+            program);
+    }
 
     RenderFrame();
 }
@@ -58,7 +88,8 @@ void Hook_glBindTexture(
     GLenum target,
     GLuint texture)
 {
-    RenderContext::SetTexture(texture);
+    RenderContext::SetTexture(
+        texture);
 
     if (Original_glBindTexture)
     {
@@ -110,6 +141,27 @@ bool InstallOpenGLHooks()
 {
     bool success = true;
 
+    auto createShader =
+        reinterpret_cast<uintptr_t>(
+            SymbolResolver::ResolveOpenGL(
+                "glCreateShader"));
+
+    if (createShader)
+    {
+        if (!HookManager::Install(
+                createShader,
+                reinterpret_cast<uintptr_t>(
+                    &Hook_glCreateShader),
+                reinterpret_cast<uintptr_t*>(
+                    &Original_glCreateShader)))
+        {
+            Logger::Error(
+                "Failed to hook glCreateShader");
+
+            success = false;
+        }
+    }
+
     auto useProgram =
         reinterpret_cast<uintptr_t>(
             SymbolResolver::ResolveOpenGL(
@@ -126,11 +178,12 @@ bool InstallOpenGLHooks()
         {
             Logger::Error(
                 "Failed to hook glUseProgram");
+
             success = false;
         }
     }
 
-    auto bindTexture =
+         auto bindTexture =
         reinterpret_cast<uintptr_t>(
             SymbolResolver::ResolveOpenGL(
                 "glBindTexture"));
@@ -146,6 +199,7 @@ bool InstallOpenGLHooks()
         {
             Logger::Error(
                 "Failed to hook glBindTexture");
+
             success = false;
         }
     }
@@ -166,6 +220,7 @@ bool InstallOpenGLHooks()
         {
             Logger::Error(
                 "Failed to hook glDrawElements");
+
             success = false;
         }
     }
@@ -186,6 +241,7 @@ bool InstallOpenGLHooks()
         {
             Logger::Error(
                 "Failed to hook glDrawArrays");
+
             success = false;
         }
     }
@@ -193,7 +249,7 @@ bool InstallOpenGLHooks()
     if (success)
     {
         Logger::Info(
-            "OpenGL Hook Stage 9 ready");
+            "OpenGL Hook Stage 10 ready");
     }
 
     return success;
@@ -204,13 +260,27 @@ bool RemoveOpenGLHooks()
     sCurrentProgram = 0;
     sFirstProgram = true;
 
+    auto createShader =
+        reinterpret_cast<uintptr_t>(
+            SymbolResolver::ResolveOpenGL(
+                "glCreateShader"));
+
+    if (createShader)
+    {
+        HookManager::Remove(
+            createShader);
+    }
+
     auto useProgram =
         reinterpret_cast<uintptr_t>(
             SymbolResolver::ResolveOpenGL(
                 "glUseProgram"));
 
     if (useProgram)
-        HookManager::Remove(useProgram);
+    {
+        HookManager::Remove(
+            useProgram);
+    }
 
     auto bindTexture =
         reinterpret_cast<uintptr_t>(
@@ -218,7 +288,10 @@ bool RemoveOpenGLHooks()
                 "glBindTexture"));
 
     if (bindTexture)
-        HookManager::Remove(bindTexture);
+    {
+        HookManager::Remove(
+            bindTexture);
+    }
 
     auto drawElements =
         reinterpret_cast<uintptr_t>(
@@ -226,7 +299,10 @@ bool RemoveOpenGLHooks()
                 "glDrawElements"));
 
     if (drawElements)
-        HookManager::Remove(drawElements);
+    {
+        HookManager::Remove(
+            drawElements);
+    }
 
     auto drawArrays =
         reinterpret_cast<uintptr_t>(
@@ -234,11 +310,15 @@ bool RemoveOpenGLHooks()
                 "glDrawArrays"));
 
     if (drawArrays)
-        HookManager::Remove(drawArrays);
+    {
+        HookManager::Remove(
+            drawArrays);
+    }
 
     RenderContext::Reset();
 
-    Logger::Info("OpenGL hooks removed");
+    Logger::Info(
+        "OpenGL hooks removed");
 
     return true;
 }
