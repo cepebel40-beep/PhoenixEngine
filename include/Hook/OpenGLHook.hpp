@@ -11,19 +11,19 @@ bool RemoveOpenGLHooks();
 extern void (*Original_glUseProgram)(GLuint);
 
 extern void (*Original_glBindTexture)(
-    GLenum,
-    GLuint);
+    GLenum target,
+    GLuint texture);
 
 extern void (*Original_glDrawElements)(
-    GLenum,
-    GLsizei,
-    GLenum,
-    const void*);
+    GLenum mode,
+    GLsizei count,
+    GLenum type,
+    const void* indices);
 
 extern void (*Original_glDrawArrays)(
-    GLenum,
-    GLint,
-    GLsizei);
+    GLenum mode,
+    GLint first,
+    GLsizei count);
 
 void Hook_glUseProgram(GLuint program);
 
