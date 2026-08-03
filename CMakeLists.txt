@@ -35,6 +35,7 @@ add_library(Phoenix64 SHARED
     src/Graphics/ShaderPipeline.cpp
     src/Graphics/OpenGLRuntime.cpp
     src/Graphics/OpenGLFunctionTable.cpp
+    src/Graphics/RenderContext.cpp
 
     # ==========================
     # Hook
