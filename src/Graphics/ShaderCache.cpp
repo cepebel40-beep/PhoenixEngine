@@ -1,33 +1,36 @@
 #include "Graphics/ShaderCache.hpp"
 
+#include "Core/Logger.hpp"
+
 namespace PHX
 {
 
-std::unordered_map<std::string, GLuint> ShaderCache::mPrograms;
+GLuint ShaderCache::sCurrentProgram = 0;
 
-bool ShaderCache::Has(const std::string& name)
+bool ShaderCache::Initialize()
 {
-    return mPrograms.find(name) != mPrograms.end();
+    sCurrentProgram = 0;
+
+    Logger::Info("ShaderCache initialized");
+
+    return true;
 }
 
-GLuint ShaderCache::Get(const std::string& name)
+void ShaderCache::Shutdown()
 {
-    auto it = mPrograms.find(name);
+    sCurrentProgram = 0;
 
-    if(it == mPrograms.end())
-        return 0;
-
-    return it->second;
+    Logger::Info("ShaderCache shutdown");
 }
 
-void ShaderCache::Store(const std::string& name, GLuint program)
+void ShaderCache::SetCurrentProgram(GLuint program)
 {
-    mPrograms[name] = program;
+    sCurrentProgram = program;
 }
 
-void ShaderCache::Clear()
+GLuint ShaderCache::GetCurrentProgram()
 {
-    mPrograms.clear();
+    return sCurrentProgram;
 }
 
 }
