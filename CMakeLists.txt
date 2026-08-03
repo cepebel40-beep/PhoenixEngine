@@ -47,6 +47,7 @@ add_library(Phoenix64 SHARED
     src/Graphics/ShaderPipeline.cpp
     src/Graphics/TextureManager.cpp
     src/Graphics/UniformManager.cpp
+    src/Graphics/ShaderInterceptor.cpp
 
     # =====================================================
     # Hook
