@@ -8,24 +8,46 @@
 namespace PHX
 {
 
-GLuint ShaderCompiler::Compile(GLenum type, const std::string& source)
+std::string ShaderCompiler::sLastError;
+
+GLuint ShaderCompiler::Compile(
+    GLenum type,
+    const std::string& source)
 {
+    sLastError.clear();
+
     GLuint shader = glCreateShader(type);
+
+    if(shader == 0)
+    {
+        sLastError = "glCreateShader failed";
+        return 0;
+    }
 
     const char* src = source.c_str();
 
     glShaderSource(shader,1,&src,nullptr);
+
     glCompileShader(shader);
 
     GLint success = GL_FALSE;
 
-    glGetShaderiv(shader,GL_COMPILE_STATUS,&success);
+    glGetShaderiv(
+        shader,
+        GL_COMPILE_STATUS,
+        &success);
 
     if(!success)
     {
-        char log[1024]{};
+        char log[2048]{};
 
-        glGetShaderInfoLog(shader,sizeof(log),nullptr,log);
+        glGetShaderInfoLog(
+            shader,
+            sizeof(log),
+            nullptr,
+            log);
+
+        sLastError = log;
 
         LOGE("%s",log);
 
@@ -39,14 +61,25 @@ GLuint ShaderCompiler::Compile(GLenum type, const std::string& source)
     return shader;
 }
 
-GLuint ShaderCompiler::CompileVertex(const std::string& source)
+GLuint ShaderCompiler::CompileVertex(
+    const std::string& source)
 {
-    return Compile(GL_VERTEX_SHADER,source);
+    return Compile(
+        GL_VERTEX_SHADER,
+        source);
 }
 
-GLuint ShaderCompiler::CompileFragment(const std::string& source)
+GLuint ShaderCompiler::CompileFragment(
+    const std::string& source)
 {
-    return Compile(GL_FRAGMENT_SHADER,source);
+    return Compile(
+        GL_FRAGMENT_SHADER,
+        source);
+}
+
+std::string ShaderCompiler::GetLastError()
+{
+    return sLastError;
 }
 
 }
